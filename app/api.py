@@ -222,6 +222,103 @@ class Api:
         Path(path).write_bytes(data)
         return str(path)
 
+    def _run_on_ui(self, callback: Any) -> Any:
+        native = getattr(self._window, "native", None) if self._window else None
+        if native is None:
+            raise RuntimeError("print_unavailable")
+        from System import Action
+
+        box: dict[str, Any] = {}
+
+        def invoke() -> None:
+            try:
+                box["value"] = callback()
+            except Exception as exc:  # noqa: BLE001
+                box["error"] = exc
+
+        native.Invoke(Action(invoke))
+        if "error" in box:
+            raise box["error"]
+        return box.get("value")
+
+    def _start_print(self, printer: str = "", pdf_path: str | None = None) -> Any:
+        native = getattr(self._window, "native", None) if self._window else None
+        if native is None:
+            raise RuntimeError("print_unavailable")
+
+        def start() -> Any:
+            core = native.webview.CoreWebView2
+            settings = core.Environment.CreatePrintSettings()
+            settings.ShouldPrintHeaderAndFooter = False
+            settings.ShouldPrintBackgrounds = True
+            if printer:
+                settings.PrinterName = printer
+            if pdf_path:
+                return core.PrintToPdfAsync(str(pdf_path), settings)
+            return core.PrintAsync(settings)
+
+        return self._run_on_ui(start)
+
+    @staticmethod
+    def _wait_for_print(task: Any, timeout: int = 90) -> bool:
+        try:
+            if not task.Wait(timeout * 1000):
+                return False
+            try:
+                result = task.Result
+            except Exception:
+                return True
+            return bool(result) if result is not None else True
+        except Exception:
+            logger.exception("Printing failed")
+            return False
+
+    @api_method
+    def list_printers(self) -> dict[str, Any]:
+        printers: list[str] = []
+        default = ""
+        try:
+            import clr  # noqa: F401
+
+            clr.AddReference("System.Drawing")
+            from System.Drawing.Printing import PrinterSettings
+
+            printers = [str(name) for name in PrinterSettings.InstalledPrinters]
+            try:
+                default = str(PrinterSettings().PrinterName or "")
+            except Exception:
+                default = ""
+        except Exception:
+            logger.exception("Could not enumerate printers")
+        if printers and default not in printers:
+            default = printers[0]
+        return {"printers": printers, "default": default}
+
+    @api_method
+    def print_note(self, printer: str = "") -> dict[str, Any]:
+        if not self._wait_for_print(self._start_print(printer)):
+            return {"ok": False, "error": "print_failed"}
+        return {"ok": True, "printer": printer}
+
+    @api_method
+    def print_note_pdf(self, filename: str = "Notra.pdf") -> dict[str, Any] | None:
+        if not self._window:
+            return None
+        safe_name = Path(str(filename or "Notra.pdf")).name or "Notra.pdf"
+        if not safe_name.lower().endswith(".pdf"):
+            safe_name = f"{safe_name}.pdf"
+        target = self._window.create_file_dialog(
+            webview.SAVE_DIALOG,
+            save_filename=safe_name,
+            file_types=("PDF document (*.pdf)",),
+        )
+        if not target:
+            return None
+        path = target[0] if isinstance(target, (list, tuple)) else target
+        if not self._wait_for_print(self._start_print("", str(path))):
+            return {"ok": False, "error": "print_failed"}
+        return {"ok": True, "path": str(path)}
+
     @api_method
     def export_backup(self) -> str | None:
         if not self._window:

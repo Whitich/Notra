@@ -1670,6 +1670,16 @@ input[type="range"]::-webkit-slider-thumb {
   .editor-scroll { scroll-behavior: auto; }
 }
 
+/* print dialog */
+.print-card { width: min(460px, 100%); }
+.print-check {
+  display: flex; align-items: center; gap: 9px; margin: 2px 0 16px;
+  font-size: 12.4px; color: var(--text-2); cursor: pointer;
+}
+.print-check input { width: 15px; height: 15px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.print-select { width: 100%; }
+.print-hint { margin: 12px 0 0; font-size: 10.6px; line-height: 1.55; color: var(--text-4); }
+
 /* ============================= print ============================= */
 @media print {
   html, body { background: #fff !important; color: #111 !important; overflow: visible; height: auto; }
@@ -1687,5 +1697,8 @@ input[type="range"]::-webkit-slider-thumb {
   .note-body .chk { border-color: #666 !important; background: #fff !important; }
   .note-body li[data-checked="true"] .chk { background: #ddd !important; }
   .note-body .chk::after { border-color: #222 !important; }
+  body.print-no-title .note-title { display: none !important; }
+  .note-body.is-empty::before, .note-body:empty::before { display: none !important; }
+  .image-frame, .image-toolbar, .image-size-badge { display: none !important; }
   @page { margin: 18mm 16mm; }
 }

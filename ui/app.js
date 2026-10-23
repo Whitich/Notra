@@ -407,7 +407,7 @@
     if (title) title.placeholder = t('editor.titlePlaceholder');
     const body = $('#note-body');
     if (body) body.dataset.placeholder = t('editor.placeholder');
-    document.title = state.note ? `${noteTitle(state.note.title)} — Notra` : 'Notra';
+    document.title = state.note ? `${noteTitle(state.note.title)} â€” Notra` : 'Notra';
     syncSettingsControls();
     updateSortLabel();
     updateFullscreenButton();
@@ -448,7 +448,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.2'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.3'}`;
   }
 
   function applySettings() {
@@ -613,12 +613,12 @@
     const title = $('#view-title');
     const subtitle = $('#view-subtitle');
     const viewTitle = currentViewTitle();
-    if (title) title.textContent = state.query ? `“${state.query}”` : viewTitle;
+    if (title) title.textContent = state.query ? `â€œ${state.query}â€` : viewTitle;
     if (subtitle) {
       if (state.query) subtitle.textContent = t('list.searchIn', { view: viewTitle });
       else {
         const words = state.notes.reduce((sum, note) => sum + (Number(note.word_count) || 0), 0);
-        subtitle.textContent = `${countLabel(state.notes.length)} · ${words.toLocaleString(state.lang === 'tr' ? 'tr-TR' : 'en-US')} ${t('stats.words').toLocaleLowerCase(state.lang === 'tr' ? 'tr-TR' : 'en-US')}`;
+        subtitle.textContent = `${countLabel(state.notes.length)} Â· ${words.toLocaleString(state.lang === 'tr' ? 'tr-TR' : 'en-US')} ${t('stats.words').toLocaleLowerCase(state.lang === 'tr' ? 'tr-TR' : 'en-US')}`;
       }
     }
     updateSortLabel();
@@ -686,7 +686,7 @@
     const footer = $('#list-footer-text');
     if (footer) {
       const words = state.notes.reduce((sum, note) => sum + (Number(note.word_count) || 0), 0);
-      footer.textContent = `${countLabel(state.notes.length)} · ${words.toLocaleString(state.lang === 'tr' ? 'tr-TR' : 'en-US')} ${t('stats.words').toLocaleLowerCase(state.lang === 'tr' ? 'tr-TR' : 'en-US')}`;
+      footer.textContent = `${countLabel(state.notes.length)} Â· ${words.toLocaleString(state.lang === 'tr' ? 'tr-TR' : 'en-US')} ${t('stats.words').toLocaleLowerCase(state.lang === 'tr' ? 'tr-TR' : 'en-US')}`;
     }
     updateListHeader();
     renderSelection();
@@ -759,10 +759,10 @@
     const status = $('#word-count');
     if (status) {
       status.hidden = !state.settings.show_word_count;
-      status.textContent = `${wordsText} · ${read}`;
+      status.textContent = `${wordsText} Â· ${read}`;
     }
     const stats = $('#note-stats');
-    if (stats) stats.textContent = `${wordsText} · ${read}`;
+    if (stats) stats.textContent = `${wordsText} Â· ${read}`;
   }
 
   function updateEditorFlags() {
@@ -846,7 +846,7 @@
     updateEditorFlags();
     updateWordCountDisplay();
     resizeNoteTitle();
-    document.title = `${noteTitle(note.title)} — Notra`;
+    document.title = `${noteTitle(note.title)} â€” Notra`;
   }
 
   function setEditorEnabled(enabled) {
@@ -1638,10 +1638,10 @@
       const meta = $('#backup-meta');
       if (meta) {
         const backup = stats.last_backup ? String(stats.last_backup).split(/[\\/]/).pop() : t('stats.noBackup');
-        meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} · ${t('stats.lastBackup')}: ${backup}`;
+        meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} Â· ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.2'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.3'}`;
     } catch (error) {
       console.error(error);
     }
@@ -1679,7 +1679,7 @@
       .replace(/<!--[\s\S]*?-->/g, '')
       .trim();
     if (!raw) return '';
-    const text = raw.length > 8000 ? `${raw.slice(0, 8000)}…` : raw;
+    const text = raw.length > 8000 ? `${raw.slice(0, 8000)}â€¦` : raw;
 
     const stash = [];
     const keep = (html) => {
@@ -1768,7 +1768,7 @@
         flushParagraph();
         if (listTag && listTag !== 'ul') flushList();
         listTag = 'ul';
-        listItems.push(bullet[1].replace(/^\[( |x|X)\]\s+/, (match, mark) => (String(mark).toLowerCase() === 'x' ? '☑ ' : '☐ ')));
+        listItems.push(bullet[1].replace(/^\[( |x|X)\]\s+/, (match, mark) => (String(mark).toLowerCase() === 'x' ? 'â˜‘ ' : 'â˜ ')));
         continue;
       }
       const ordered = trimmed.match(/^\d+[.)]\s+(.+)$/);
@@ -2226,7 +2226,7 @@
         const active = state.historySelected === revision.id;
         return `<button class="history-item${active ? ' active' : ''}" data-revision="${revision.id}">
           <div class="history-date">${escapeHtml(parts.date)}</div>
-          <div class="history-time">${escapeHtml(parts.time)} · ${escapeHtml(t('history.words', { n: revision.word_count || 0 }))}</div>
+          <div class="history-time">${escapeHtml(parts.time)} Â· ${escapeHtml(t('history.words', { n: revision.word_count || 0 }))}</div>
           <div class="history-excerpt">${escapeHtml(revision.excerpt || revision.title || t('editor.noContent'))}</div>
         </button>`;
       }).join('');
@@ -3157,13 +3157,71 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
 </html>`;
   }
 
+  async function openPrintDialog() {
+    if (!state.note) return;
+    if (state.dirty) await saveNow();
+    const modal = $('#print-modal');
+    if (!modal) return;
+    const include = $('#print-include-title');
+    if (include) include.checked = true;
+    const select = $('#print-printer');
+    if (select) {
+      select.innerHTML = `<option value="">${escapeHtml(t('print.loading'))}</option>`;
+      try {
+        const info = await call('list_printers');
+        const printers = Array.isArray(info?.printers) ? info.printers : [];
+        select.innerHTML = printers.length
+          ? printers.map((name) => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join('')
+          : `<option value="">${escapeHtml(t('print.noPrinters'))}</option>`;
+        if (info?.default) select.value = info.default;
+      } catch (error) {
+        console.error(error);
+        select.innerHTML = `<option value="">${escapeHtml(t('print.systemDefault'))}</option>`;
+      }
+    }
+    openModal(modal);
+  }
+
+  async function runPrint(mode) {
+    const note = state.note;
+    if (!note) return;
+    const includeTitle = $('#print-include-title')?.checked !== false;
+    const printer = $('#print-printer')?.value || '';
+    const asPdf = mode === 'pdf' || /pdf/i.test(printer);
+    const start = $('#print-start');
+    const pdfButton = $('#print-save-pdf');
+    if (start) start.disabled = true;
+    if (pdfButton) pdfButton.disabled = true;
+    document.body.classList.toggle('print-no-title', !includeTitle);
+    try {
+      if (asPdf) {
+        const name = (note.title || t('common.untitled')).replace(/[\\/:*?"<>|]/g, ' ').trim().slice(0, 80) || 'Notra';
+        const result = await call('print_note_pdf', `${name}.pdf`);
+        if (result?.path) {
+          showToast(t('print.pdfSaved'), 'success');
+          closeModal($('#print-modal'));
+        }
+      } else {
+        await call('print_note', printer);
+        showToast(t('print.sent'), 'success');
+        closeModal($('#print-modal'));
+      }
+    } catch (error) {
+      console.error(error);
+      showToast(t('print.failed'), 'error');
+    } finally {
+      document.body.classList.remove('print-no-title');
+      if (start) start.disabled = false;
+      if (pdfButton) pdfButton.disabled = false;
+    }
+  }
+
   async function exportNote(kind) {
     if (!state.note) return;
     if (state.dirty) await saveNow();
     const note = state.note;
     if (kind === 'pdf') {
-      showToast(t('toast.printHint'), 'info', { duration: 5200 });
-      setTimeout(() => window.print(), 250);
+      await openPrintDialog();
       return;
     }
     try {
@@ -3259,7 +3317,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
       { label: t('editor.exportHtml'), icon: 'code', action: () => exportNote('html') },
       { label: t('editor.exportMarkdown'), icon: 'note', action: () => exportNote('markdown') },
       { label: t('editor.exportText'), icon: 'file', action: () => exportNote('text') },
-      { label: t('editor.exportPdf'), icon: 'print', action: () => exportNote('pdf') }
+      { label: t('editor.exportPdf'), icon: 'print', action: () => openPrintDialog() }
     ], anchor);
   }
 
@@ -3284,7 +3342,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
         { label: t('editor.exportHtml'), icon: 'code', action: () => exportNote('html') },
         { label: t('editor.exportMarkdown'), icon: 'note', action: () => exportNote('markdown') },
         { label: t('editor.exportText'), icon: 'file', action: () => exportNote('text') },
-        { label: t('editor.exportPdf'), icon: 'print', action: () => exportNote('pdf') },
+        { label: t('editor.exportPdf'), icon: 'print', action: () => openPrintDialog() },
         { type: 'sep' },
         { label: t('editor.trash'), icon: 'trash', danger: true, action: trashCurrent }
       );
@@ -3510,7 +3568,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
   }
 
   function paletteCommands() {
-    const nextLanguage = state.lang === 'en' ? 'Türkçe' : 'English';
+    const nextLanguage = state.lang === 'en' ? 'TÃ¼rkÃ§e' : 'English';
     return [
       { id: 'new-note', label: t('commands.newNote'), icon: 'plus', keywords: 'create note', action: () => newNote() },
       { id: 'new-notebook', label: t('commands.newNotebook'), icon: 'book', keywords: 'group folder', action: () => openGroupModal() },
@@ -3558,7 +3616,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
       return `<button class="command-item" data-palette-index="${index}">
         ${SVG('note')}
         <span class="command-note-title">${escapeHtml(title)}</span>
-        <span class="command-meta">${escapeHtml(group)} · ${escapeHtml(relativeTime(item.updated_at))}</span>
+        <span class="command-meta">${escapeHtml(group)} Â· ${escapeHtml(relativeTime(item.updated_at))}</span>
       </button>`;
     }
     return `<button class="command-item" data-palette-index="${index}">
@@ -4391,6 +4449,9 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
       renderHistory();
     });
     $('#image-modal')?.addEventListener('click', () => closeModal($('#image-modal')));
+    $('#print-cancel')?.addEventListener('click', () => closeModal($('#print-modal')));
+    $('#print-start')?.addEventListener('click', () => runPrint('print'));
+    $('#print-save-pdf')?.addEventListener('click', () => runPrint('pdf'));
   }
 
   function bindCloseButtons() {
@@ -4596,7 +4657,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
     }
     if (mod && key === 'p') {
       event.preventDefault();
-      if (state.note) exportNote('pdf');
+      if (state.note) openPrintDialog();
       return;
     }
     if (key === 'f1') {

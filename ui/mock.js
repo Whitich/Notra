@@ -267,7 +267,7 @@
     },
     async bootstrap() {
       return {
-        app: { name: 'Notra', version: '1.1.2' },
+        app: { name: 'Notra', version: '1.1.3' },
         settings: { ...settings },
         meta: meta(),
         default_notes: sortNotes(notes.filter((note) => matchesView(note, settings.default_view, null, null, '')), settings.sort).map(hydrate)
@@ -441,10 +441,10 @@
       return stats();
     },
     async check_for_update() {
-      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.2';
+      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.3';
       return {
         ok: true,
-        current: '1.1.2',
+        current: '1.1.3',
         latest,
         available: mockUpdateAvailable,
         release_url: 'https://github.com/Whitich/Notra/releases/latest',
@@ -471,6 +471,15 @@
     },
     async install_update() {
       return { ok: true, started: true };
+    },
+    async list_printers() {
+      return { printers: ['Microsoft Print to PDF', 'Mock Printer'], default: 'Microsoft Print to PDF' };
+    },
+    async print_note(printer) {
+      return { ok: true, printer };
+    },
+    async print_note_pdf(filename) {
+      return { ok: true, path: `C:\\Users\\Mock\\Documents\\${filename || 'Notra.pdf'}` };
     },
     async pick_images() {
       return [{ name: 'mock-sketch.png', mime: 'image/png', data_url: samplePng, size: 68 }];
