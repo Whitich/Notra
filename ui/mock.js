@@ -267,7 +267,7 @@
     },
     async bootstrap() {
       return {
-        app: { name: 'Notra', version: '1.1.7' },
+        app: { name: 'Notra', version: '1.1.8' },
         settings: { ...settings },
         meta: meta(),
         default_notes: sortNotes(notes.filter((note) => matchesView(note, settings.default_view, null, null, '')), settings.sort).map(hydrate)
@@ -441,10 +441,10 @@
       return stats();
     },
     async check_for_update() {
-      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.7';
+      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.8';
       return {
         ok: true,
-        current: '1.1.7',
+        current: '1.1.8',
         latest,
         available: mockUpdateAvailable,
         release_url: 'https://github.com/Whitich/Notra/releases/latest',
@@ -477,6 +477,9 @@
     },
     async print_note(backgrounds) {
       return { ok: true, backgrounds };
+    },
+    async set_print_color_scheme(light) {
+      return true;
     },
     async print_note_pdf(filename, backgrounds) {
       return { ok: true, path: `C:\\Users\\Mock\\Documents\\${filename || 'Notra.pdf'}`, backgrounds };

@@ -349,6 +349,21 @@ class Api:
         return {"printers": printers, "default": default}
 
     @api_method
+    def set_print_color_scheme(self, light: bool = True) -> bool:
+        def apply() -> bool:
+            from Microsoft.Web.WebView2.Core import CoreWebView2PreferredColorScheme
+
+            profile = self._window.native.webview.CoreWebView2.Profile
+            profile.PreferredColorScheme = (
+                CoreWebView2PreferredColorScheme.Light
+                if light
+                else CoreWebView2PreferredColorScheme.Auto
+            )
+            return True
+
+        return bool(self._run_on_ui(apply))
+
+    @api_method
     def print_note(self, backgrounds: bool = True) -> dict[str, Any]:
         task = self._start_print_dialog(bool(backgrounds))
         if task is None:

@@ -454,7 +454,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.7'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.8'}`;
   }
 
   function applySettings() {
@@ -1649,7 +1649,7 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} Ã‚Â· ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.7'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.8'}`;
     } catch (error) {
       console.error(error);
     }
@@ -3165,10 +3165,31 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
 </html>`;
   }
 
-  function printCurrentNote() {
+  let printRestoreTimer = 0;
+
+  async function printCurrentNote(includeTitleOverride = null) {
     if (!state.note) return;
-    if (state.dirty) saveNow().then(() => window.print()).catch(() => window.print());
-    else window.print();
+    if (state.dirty) await saveNow();
+    const includeTitle = includeTitleOverride === null
+      ? state.settings.print_include_title !== false
+      : Boolean(includeTitleOverride);
+    document.body.classList.toggle('print-no-title', !includeTitle);
+    try {
+      await call('set_print_color_scheme', true);
+    } catch (error) {
+      console.error(error);
+    }
+    let restored = false;
+    const restore = () => {
+      if (restored) return;
+      restored = true;
+      document.body.classList.toggle('print-no-title', state.settings.print_include_title === false);
+      call('set_print_color_scheme', false).catch(() => {});
+    };
+    window.addEventListener('focus', () => window.setTimeout(restore, 400), { once: true });
+    window.clearTimeout(printRestoreTimer);
+    printRestoreTimer = window.setTimeout(restore, 120000);
+    window.print();
   }
 
   async function saveNotePdf() {
@@ -3284,6 +3305,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
   function openExportMenu(anchor) {
     openAnchoredMenu([
       { label: t('editor.print'), icon: 'print', action: () => printCurrentNote() },
+      { label: t('editor.printNoTitle'), icon: 'print', action: () => printCurrentNote(false) },
       { type: 'sep' },
       { type: 'label', label: t('editor.export') },
       { label: t('editor.exportHtml'), icon: 'code', action: () => exportNote('html') },
@@ -3311,6 +3333,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
         { label: t('editor.duplicate'), icon: 'copy', action: duplicateCurrent },
         { type: 'sep' },
         { label: t('editor.print'), icon: 'print', action: () => printCurrentNote() },
+      { label: t('editor.printNoTitle'), icon: 'print', action: () => printCurrentNote(false) },
         { type: 'label', label: t('editor.export') },
         { label: t('editor.exportHtml'), icon: 'code', action: () => exportNote('html') },
         { label: t('editor.exportMarkdown'), icon: 'note', action: () => exportNote('markdown') },
