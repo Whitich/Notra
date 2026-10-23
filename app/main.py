@@ -3,6 +3,7 @@ from __future__ import annotations
 import ctypes
 import logging
 import os
+import shutil
 import sys
 import traceback
 from pathlib import Path
@@ -10,7 +11,16 @@ from pathlib import Path
 import webview
 
 from .api import Api, apply_titlebar_theme
-from .store import APP_NAME, Store
+from .store import APP_NAME, APP_VERSION, Store
+
+WEBVIEW_CACHE_DIRS = (
+    "Cache",
+    "Code Cache",
+    "GPUCache",
+    "DawnGraphiteCache",
+    "DawnWebGPUCache",
+    "Shared Dictionary",
+)
 
 
 def resource_dir() -> Path:
@@ -43,6 +53,37 @@ def show_error(message: str) -> None:
         ctypes.windll.user32.MessageBoxW(None, message, "Notra", 0x10)
     except Exception:
         pass
+
+
+def refresh_webview_cache(storage: Path) -> None:
+    """Clear WebView2's disk cache when the app version changes.
+
+    WebView2 caches file:// responses, so right after an update the window can
+    keep rendering the previous release's HTML, CSS and JavaScript. Clearing
+    only the cache folders keeps Local Storage (draft recovery) intact.
+    """
+    marker = storage / ".app-version"
+    try:
+        cached_version = marker.read_text(encoding="utf-8").strip()
+    except OSError:
+        cached_version = ""
+    if cached_version == APP_VERSION:
+        return
+
+    profile = storage / "EBWebView" / "Default"
+    for name in WEBVIEW_CACHE_DIRS:
+        shutil.rmtree(profile / name, ignore_errors=True)
+
+    if any((profile / name).exists() for name in WEBVIEW_CACHE_DIRS):
+        # A previous instance still holds the profile; try again next launch.
+        logging.getLogger(__name__).info("WebView cache is still locked, will retry")
+        return
+
+    try:
+        storage.mkdir(parents=True, exist_ok=True)
+        marker.write_text(APP_VERSION, encoding="utf-8")
+    except OSError:
+        logging.getLogger(__name__).warning("Could not write WebView cache marker")
 
 
 def acquire_single_instance() -> tuple[bool, object]:
@@ -89,6 +130,8 @@ def main() -> None:
     assets = resource_dir() / "assets"
     ui = resource_dir() / "ui"
     icon = assets / "icon.ico"
+    storage = directory / "webview"
+    refresh_webview_cache(storage)
     settings = store.settings()
 
     screen_w, screen_h = screen_size()
@@ -179,7 +222,7 @@ def main() -> None:
             icon=str(icon),
             debug=bool(os.environ.get("NOTRA_DEBUG")),
             private_mode=False,
-            storage_path=str(directory / "webview"),
+            storage_path=str(storage),
         )
     except Exception:
         logging.exception("Fatal error")

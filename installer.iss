@@ -1,5 +1,5 @@
 #define MyAppName "Notra"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.1.1"
 #define MyAppPublisher "Notra"
 #define MyAppExeName "Notra.exe"
 
