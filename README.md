@@ -50,6 +50,7 @@ Use the button above to download the latest **Notra Setup** directly.
 - Table tools for adding or removing rows and columns, with Tab navigation between cells
 - Drawing studio; insert sketches directly into a note
 - Images via paste, drag and drop, or the image picker
+- Word-like image editing: drag the handles to resize, then align left, center or right
 - Full-text search across your notes
 - Notebooks, tags, pinning, favorites, archive and trash
 - Revision history with restore

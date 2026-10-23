@@ -12,7 +12,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
-APP_VERSION = "1.1.1"
+APP_VERSION = "1.1.2"
 APP_NAME = "Notra"
 
 DEFAULT_SETTINGS: dict[str, Any] = {

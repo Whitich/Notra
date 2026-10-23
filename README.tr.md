@@ -50,6 +50,7 @@ Yukarıdaki butonla son **Notra Setup** sürümünü doğrudan indirebilirsiniz.
 - Satır ve sütun ekleme/çıkarma araçları ve hücreler arasında Tab ile gezinme
 - Çizim stüdyosu; çizimleri doğrudan nota ekleme
 - Panodan yapıştırma, sürükle-bırak veya görsel seçici ile görsel ekleme
+- Word benzeri görsel düzenleme: tutamaçlardan sürükleyerek büyütüp küçültme, sola/ortaya/sağa hizalama
 - Notlar içinde tam metin arama
 - Defterler, etiketler, sabitleme, favoriler, arşiv ve çöp kutusu
 - Sürüm geçmişi ve geri yükleme

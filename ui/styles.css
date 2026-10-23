@@ -872,8 +872,54 @@ kbd {
   display: block;
   margin: 1.1em auto;
   box-shadow: var(--shadow-sm);
-  cursor: zoom-in;
+  cursor: pointer;
 }
+
+/* image selection, resize handles and alignment toolbar */
+.image-frame {
+  position: fixed; z-index: 90; box-sizing: border-box; pointer-events: none;
+  border: 1.5px solid var(--accent); border-radius: 12px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+  visibility: hidden;
+}
+.image-frame[hidden] { display: none; }
+.image-frame.is-resizing { border-style: dashed; }
+.image-handle {
+  position: absolute; width: 11px; height: 11px; margin: -6px 0 0 -6px;
+  border-radius: 3px; background: var(--bg-editor); border: 1.5px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .35); pointer-events: auto;
+}
+.image-handle.nw { top: 0; left: 0; cursor: nwse-resize; }
+.image-handle.n { top: 0; left: 50%; cursor: ns-resize; }
+.image-handle.ne { top: 0; left: 100%; cursor: nesw-resize; }
+.image-handle.e { top: 50%; left: 100%; cursor: ew-resize; }
+.image-handle.se { top: 100%; left: 100%; cursor: nwse-resize; }
+.image-handle.s { top: 100%; left: 50%; cursor: ns-resize; }
+.image-handle.sw { top: 100%; left: 0; cursor: nesw-resize; }
+.image-handle.w { top: 50%; left: 0; cursor: ew-resize; }
+.image-size-badge {
+  position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%);
+  display: none; padding: 2px 7px; border-radius: 6px;
+  background: var(--bg-sidebar); border: 1px solid var(--border-strong);
+  color: var(--text-2); font-size: 10px; font-variant-numeric: tabular-nums;
+  white-space: nowrap; pointer-events: none;
+}
+.image-frame.is-resizing .image-size-badge { display: block; }
+.image-toolbar {
+  position: absolute; right: 0; bottom: calc(100% + 9px);
+  display: flex; align-items: center; gap: 2px; padding: 4px;
+  background: var(--bg-sidebar); border: 1px solid var(--border-strong);
+  border-radius: 9px; box-shadow: var(--shadow-md); pointer-events: auto;
+}
+.image-frame.toolbar-below .image-toolbar { bottom: auto; top: calc(100% + 9px); }
+.image-toolbar button {
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; color: var(--text-3);
+}
+.image-toolbar button:hover { background: var(--bg-hover); color: var(--text-1); }
+.image-toolbar .icon { width: 14px; height: 14px; }
+.image-toolbar-sep { width: 1px; height: 16px; margin: 0 2px; background: var(--border); }
+body.image-resizing { user-select: none; }
 .note-body .table-scroll {
   margin: 1.1em 0;
   overflow-x: auto;

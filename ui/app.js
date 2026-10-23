@@ -287,7 +287,8 @@
   const ALLOWED_CLASSES = new Set(['callout', 'muted', 'checklist', 'chk', 'chk-text', 'note-image', 'table-scroll']);
   const ALLOWED_STYLES = new Set([
     'color', 'background-color', 'text-align', 'font-family', 'font-size', 'font-weight',
-    'font-style', 'text-decoration', 'text-decoration-line', 'width', 'height', 'max-width', 'border-radius'
+    'font-style', 'text-decoration', 'text-decoration-line', 'width', 'height', 'max-width',
+    'border-radius', 'margin-left', 'margin-right'
   ]);
 
   function safeUrl(value, allowDataImage = false) {
@@ -447,7 +448,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.1'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.2'}`;
   }
 
   function applySettings() {
@@ -943,6 +944,7 @@
   function renderEditor(options = {}) {
     const note = state.note;
     if (!note) return;
+    clearImageSelection();
     $('#editor-empty').hidden = true;
     $('#editor-shell').hidden = false;
     updateEditorMeta();
@@ -999,6 +1001,7 @@
     state.dirty = false;
     state.renderedNoteId = null;
     hideTableTools();
+    clearImageSelection();
     clearTimeout(state.saveTimer);
     $('#editor-shell').hidden = true;
     $('#editor-empty').hidden = false;
@@ -1638,7 +1641,7 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} · ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.1'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.2'}`;
     } catch (error) {
       console.error(error);
     }
@@ -2382,6 +2385,187 @@
     restoreEditorRange();
     document.execCommand('insertHTML', false, html);
     afterEditorInput();
+  }
+
+  const IMAGE_HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+  const IMAGE_MIN_WIDTH = 60;
+
+  function imageFrame() {
+    let frame = $('#image-frame');
+    if (frame) return frame;
+    frame = document.createElement('div');
+    frame.id = 'image-frame';
+    frame.className = 'image-frame';
+    frame.hidden = true;
+    IMAGE_HANDLES.forEach((name) => {
+      const handle = document.createElement('span');
+      handle.className = `image-handle ${name}`;
+      handle.dataset.handle = name;
+      frame.appendChild(handle);
+    });
+    const badge = document.createElement('span');
+    badge.className = 'image-size-badge';
+    frame.appendChild(badge);
+    const toolbar = document.createElement('div');
+    toolbar.className = 'image-toolbar';
+    toolbar.innerHTML = [
+      `<button type="button" data-image-align="left" title="${escapeHtml(t('image.alignLeft'))}" aria-label="${escapeHtml(t('image.alignLeft'))}"><svg class="icon"><use href="#i-align-left"></use></svg></button>`,
+      `<button type="button" data-image-align="center" title="${escapeHtml(t('image.alignCenter'))}" aria-label="${escapeHtml(t('image.alignCenter'))}"><svg class="icon"><use href="#i-align-center"></use></svg></button>`,
+      `<button type="button" data-image-align="right" title="${escapeHtml(t('image.alignRight'))}" aria-label="${escapeHtml(t('image.alignRight'))}"><svg class="icon"><use href="#i-align-right"></use></svg></button>`,
+      '<span class="image-toolbar-sep"></span>',
+      `<button type="button" data-image-reset title="${escapeHtml(t('image.resetSize'))}" aria-label="${escapeHtml(t('image.resetSize'))}"><svg class="icon"><use href="#i-expand"></use></svg></button>`
+    ].join('');
+    frame.appendChild(toolbar);
+    frame.addEventListener('pointerdown', (event) => {
+      if (event.target.closest('.image-toolbar')) {
+        event.preventDefault();
+        return;
+      }
+      const handle = event.target.closest('[data-handle]');
+      if (handle) beginImageResize(event, handle.dataset.handle);
+    });
+    frame.addEventListener('click', (event) => {
+      const align = event.target.closest('[data-image-align]');
+      if (align) {
+        event.preventDefault();
+        applyImageAlignment(align.dataset.imageAlign);
+        return;
+      }
+      if (event.target.closest('[data-image-reset]')) {
+        event.preventDefault();
+        resetImageSize();
+      }
+    });
+    document.body.appendChild(frame);
+    return frame;
+  }
+
+  function imageEditorWidth() {
+    const body = $('#note-body');
+    return Math.max(240, (body ? body.clientWidth : window.innerWidth) - 8);
+  }
+
+  function positionImageFrame() {
+    const img = state.imageSelection;
+    const frame = $('#image-frame');
+    if (!img || !frame || frame.hidden) return;
+    if (!img.isConnected) {
+      clearImageSelection();
+      return;
+    }
+    const rect = img.getBoundingClientRect();
+    if (rect.width < 6 || rect.height < 6 || rect.bottom < 0 || rect.top > window.innerHeight) {
+      frame.style.visibility = 'hidden';
+      return;
+    }
+    frame.style.visibility = 'visible';
+    frame.style.left = `${rect.left}px`;
+    frame.style.top = `${rect.top}px`;
+    frame.style.width = `${rect.width}px`;
+    frame.style.height = `${rect.height}px`;
+    frame.classList.toggle('toolbar-below', rect.top < 74);
+  }
+
+  function selectImage(img) {
+    if (!img || !$('#note-body')?.contains(img)) return;
+    const frame = imageFrame();
+    state.imageSelection = img;
+    frame.hidden = false;
+    document.body.classList.add('image-selected');
+    positionImageFrame();
+  }
+
+  function clearImageSelection() {
+    if (!state.imageSelection) return;
+    state.imageSelection = null;
+    const frame = $('#image-frame');
+    if (frame) {
+      frame.hidden = true;
+      frame.classList.remove('is-resizing', 'toolbar-below');
+    }
+    document.body.classList.remove('image-selected', 'image-resizing');
+  }
+
+  function beginImageResize(event, handle) {
+    const img = state.imageSelection;
+    if (!img) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const frame = $('#image-frame');
+    const rect = img.getBoundingClientRect();
+    const ratio = rect.width > 0 ? rect.height / rect.width : 1;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startWidth = rect.width;
+    const maxWidth = imageEditorWidth();
+    const badge = frame ? frame.querySelector('.image-size-badge') : null;
+    document.body.classList.add('image-resizing');
+    if (frame) frame.classList.add('is-resizing');
+    if (badge) badge.textContent = `${Math.round(startWidth)} px`;
+
+    const move = (moveEvent) => {
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+      let delta;
+      if (handle === 'e') delta = dx;
+      else if (handle === 'w') delta = -dx;
+      else if (handle === 'n') delta = -dy / (ratio || 1);
+      else if (handle === 's') delta = dy / (ratio || 1);
+      else {
+        const horizontal = handle.includes('e') ? dx : -dx;
+        const vertical = (handle.includes('s') ? dy : -dy) / (ratio || 1);
+        delta = Math.abs(horizontal) >= Math.abs(vertical) ? horizontal : vertical;
+      }
+      const width = clamp(startWidth + delta, IMAGE_MIN_WIDTH, maxWidth);
+      img.style.width = `${Math.round(width)}px`;
+      img.style.removeProperty('height');
+      if (badge) badge.textContent = `${Math.round(width)} px`;
+      positionImageFrame();
+    };
+    const finish = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', finish);
+      window.removeEventListener('pointercancel', finish);
+      document.body.classList.remove('image-resizing');
+      if (frame) frame.classList.remove('is-resizing');
+      if (state.imageSelection === img) {
+        markDirty();
+        positionImageFrame();
+      }
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', finish);
+    window.addEventListener('pointercancel', finish);
+  }
+
+  function applyImageAlignment(align) {
+    const img = state.imageSelection;
+    if (!img) return;
+    img.style.removeProperty('margin-left');
+    img.style.removeProperty('margin-right');
+    if (align === 'left') {
+      img.style.marginLeft = '0';
+      img.style.marginRight = 'auto';
+    } else if (align === 'right') {
+      img.style.marginLeft = 'auto';
+      img.style.marginRight = '0';
+    } else {
+      img.style.marginLeft = 'auto';
+      img.style.marginRight = 'auto';
+    }
+    markDirty();
+    positionImageFrame();
+  }
+
+  function resetImageSize() {
+    const img = state.imageSelection;
+    if (!img) return;
+    img.style.removeProperty('width');
+    img.style.removeProperty('height');
+    img.removeAttribute('width');
+    img.removeAttribute('height');
+    markDirty();
+    positionImageFrame();
   }
 
   function applyBlockStyle(tag) {
@@ -3945,6 +4129,7 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
       updateLiveCounts();
       saveEditorRange();
       refreshToolbarState();
+      if (state.imageSelection) positionImageFrame();
     });
     body?.addEventListener('keydown', (event) => {
       handleTableTab(event);
@@ -3960,15 +4145,32 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
       const image = event.target.closest('img');
       if (image) {
         event.preventDefault();
-        openImagePreview(image.getAttribute('src'));
+        if (event.detail >= 2) {
+          clearImageSelection();
+          openImagePreview(image.getAttribute('src'));
+        } else {
+          selectImage(image);
+        }
         return;
       }
+      if (state.imageSelection) clearImageSelection();
       const link = event.target.closest('a');
       if (link) {
         event.preventDefault();
         if (event.ctrlKey || event.metaKey) call('open_external', link.getAttribute('href')).catch(() => {});
       }
     });
+
+    $('#editor-scroll')?.addEventListener('scroll', () => positionImageFrame(), { passive: true });
+    window.addEventListener('resize', () => positionImageFrame());
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && state.imageSelection) clearImageSelection();
+    });
+    document.addEventListener('pointerdown', (event) => {
+      if (!state.imageSelection) return;
+      if (event.target.closest('#image-frame') || event.target.closest('img')) return;
+      clearImageSelection();
+    }, true);
 
     $('#editor-toolbar')?.addEventListener('mousedown', (event) => {
       if (event.target.closest('button')) event.preventDefault();
