@@ -51,7 +51,7 @@ Yukarıdaki butonla son **Notra Setup** sürümünü doğrudan indirebilirsiniz.
 - Çizim stüdyosu; çizimleri doğrudan nota ekleme
 - Panodan yapıştırma, sürükle-bırak veya görsel seçici ile görsel ekleme
 - Word benzeri görsel düzenleme: tutamaçlardan sürükleyerek büyütüp küçültme, sola/ortaya/sağa hizalama
-- Temiz yazdırma: tarih, adres ve sayfa numarası olmadan; not başlığını yazdırıp yazdırmama seçeneği
+- Windows yazdırma penceresiyle temiz çıktı: tarih, adres ve sayfa numarası olmadan; not başlığı ve arka plan renkleri isteğe bağlı
 - Notlar içinde tam metin arama
 - Defterler, etiketler, sabitleme, favoriler, arşiv ve çöp kutusu
 - Sürüm geçmişi ve geri yükleme

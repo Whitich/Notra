@@ -51,7 +51,7 @@ Use the button above to download the latest **Notra Setup** directly.
 - Drawing studio; insert sketches directly into a note
 - Images via paste, drag and drop, or the image picker
 - Word-like image editing: drag the handles to resize, then align left, center or right
-- Clean printing: no date, URL or page-number artefacts, with an option to leave out the note title
+- Clean printing through the Windows print dialog: no date, URL or page-number artefacts, with optional note title and background colors
 - Full-text search across your notes
 - Notebooks, tags, pinning, favorites, archive and trash
 - Revision history with restore

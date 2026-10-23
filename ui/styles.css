@@ -1690,7 +1690,9 @@ input[type="range"]::-webkit-slider-thumb {
   .note-title { color: #111 !important; font-size: 28pt !important; margin-bottom: 18pt !important; -webkit-text-fill-color: #111; }
   .note-body { color: #111 !important; font-size: 11.5pt !important; line-height: 1.65 !important; padding: 0 !important; min-height: 0 !important; }
   .note-body a { color: #111 !important; text-decoration: underline; }
-  .note-body pre, .note-body blockquote, .note-body th { background: #f4f4f4 !important; }
+  body:not(.print-colors) .note-body pre,
+  body:not(.print-colors) .note-body blockquote,
+  body:not(.print-colors) .note-body th { background: #f4f4f4 !important; }
   .note-body blockquote { border-left-color: #999 !important; }
   .note-body img { box-shadow: none !important; break-inside: avoid; }
   .note-body h1, .note-body h2, .note-body h3 { color: #111 !important; }

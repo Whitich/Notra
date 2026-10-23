@@ -448,7 +448,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.4'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.5'}`;
   }
 
   function applySettings() {
@@ -1641,7 +1641,7 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} Â· ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.4'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.5'}`;
     } catch (error) {
       console.error(error);
     }
@@ -3164,21 +3164,8 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
     if (!modal) return;
     const include = $('#print-include-title');
     if (include) include.checked = true;
-    const select = $('#print-printer');
-    if (select) {
-      select.innerHTML = `<option value="">${escapeHtml(t('print.loading'))}</option>`;
-      try {
-        const info = await call('list_printers');
-        const printers = Array.isArray(info?.printers) ? info.printers : [];
-        select.innerHTML = printers.length
-          ? printers.map((name) => `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`).join('')
-          : `<option value="">${escapeHtml(t('print.noPrinters'))}</option>`;
-        if (info?.default) select.value = info.default;
-      } catch (error) {
-        console.error(error);
-        select.innerHTML = `<option value="">${escapeHtml(t('print.systemDefault'))}</option>`;
-      }
-    }
+    const backgrounds = $('#print-backgrounds');
+    if (backgrounds) backgrounds.checked = true;
     openModal(modal);
   }
 
@@ -3186,31 +3173,33 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
     const note = state.note;
     if (!note) return;
     const includeTitle = $('#print-include-title')?.checked !== false;
-    const printer = $('#print-printer')?.value || '';
-    const asPdf = mode === 'pdf' || /pdf/i.test(printer);
+    const backgrounds = $('#print-backgrounds')?.checked !== false;
+    const asPdf = mode === 'pdf';
     const start = $('#print-start');
     const pdfButton = $('#print-save-pdf');
     if (start) start.disabled = true;
     if (pdfButton) pdfButton.disabled = true;
     document.body.classList.toggle('print-no-title', !includeTitle);
+    document.body.classList.toggle('print-colors', backgrounds);
     try {
       if (asPdf) {
         const name = (note.title || t('common.untitled')).replace(/[\\/:*?"<>|]/g, ' ').trim().slice(0, 80) || 'Notra';
-        const result = await call('print_note_pdf', `${name}.pdf`);
+        const result = await call('print_note_pdf', `${name}.pdf`, backgrounds);
         if (result?.path) {
           showToast(t('print.pdfSaved'), 'success');
           closeModal($('#print-modal'));
         }
       } else {
-        await call('print_note', printer);
+        await call('print_note', backgrounds);
         showToast(t('print.sent'), 'success');
         closeModal($('#print-modal'));
       }
     } catch (error) {
+      if (String(error?.message || '') === 'print_cancelled') return;
       console.error(error);
       showToast(t('print.failed'), 'error');
     } finally {
-      document.body.classList.remove('print-no-title');
+      document.body.classList.remove('print-no-title', 'print-colors');
       if (start) start.disabled = false;
       if (pdfButton) pdfButton.disabled = false;
     }

@@ -690,7 +690,7 @@
               <div>
                 <h3>Notra</h3>
                 <p data-i18n="settings.aboutText">A calm, local-first home for notes, ideas and sketches.</p>
-                <span class="version-pill" id="about-version">v1.1.4</span>
+                <span class="version-pill" id="about-version">v1.1.5</span>
               </div>
             </div>
             <div class="update-card" id="update-card">
@@ -942,8 +942,10 @@
           <input type="checkbox" id="print-include-title" checked>
           <span data-i18n="print.includeTitle">Print note title</span>
         </label>
-        <label class="field-label" for="print-printer" data-i18n="print.printer">Printer</label>
-        <select id="print-printer" class="setting-select print-select"></select>
+        <label class="print-check">
+          <input type="checkbox" id="print-backgrounds" checked>
+          <span data-i18n="print.backgrounds">Print background colors</span>
+        </label>
         <p class="print-hint" data-i18n="print.hint">Date, URL and page numbers are left out automatically.</p>
       </div>
       <div class="modal-foot">

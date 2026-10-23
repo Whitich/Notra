@@ -241,7 +241,12 @@ class Api:
             raise box["error"]
         return box.get("value")
 
-    def _start_print(self, printer: str = "", pdf_path: str | None = None) -> Any:
+    def _start_print(
+        self,
+        backgrounds: bool = True,
+        pdf_path: str | None = None,
+        printer: str = "",
+    ) -> Any:
         native = getattr(self._window, "native", None) if self._window else None
         if native is None:
             raise RuntimeError("print_unavailable")
@@ -250,11 +255,60 @@ class Api:
             core = native.webview.CoreWebView2
             settings = core.Environment.CreatePrintSettings()
             settings.ShouldPrintHeaderAndFooter = False
-            settings.ShouldPrintBackgrounds = True
+            settings.ShouldPrintBackgrounds = bool(backgrounds)
             if printer:
                 settings.PrinterName = printer
             if pdf_path:
                 return core.PrintToPdfAsync(str(pdf_path), settings)
+            return core.PrintAsync(settings)
+
+        return self._run_on_ui(start)
+
+    def _start_print_dialog(self, backgrounds: bool = True) -> Any:
+        native = getattr(self._window, "native", None) if self._window else None
+        if native is None:
+            raise RuntimeError("print_unavailable")
+
+        def start() -> Any:
+            import clr  # noqa: F401
+
+            clr.AddReference("System.Drawing")
+            clr.AddReference("System.Windows.Forms")
+            from System.Windows.Forms import DialogResult, PrintDialog
+
+            dialog = PrintDialog()
+            dialog.UseEXDialog = True
+            dialog.AllowCurrentPage = True
+            dialog.AllowSomePages = True
+            dialog.ShowNetwork = True
+            if dialog.ShowDialog(native) != DialogResult.OK:
+                return None
+
+            printer = dialog.PrinterSettings
+            core = native.webview.CoreWebView2
+            settings = core.Environment.CreatePrintSettings()
+            settings.ShouldPrintHeaderAndFooter = False
+            settings.ShouldPrintBackgrounds = bool(backgrounds)
+            try:
+                settings.PrinterName = str(printer.PrinterName)
+            except Exception:
+                pass
+            try:
+                copies = int(printer.Copies)
+                if copies > 1:
+                    settings.Copies = copies
+            except Exception:
+                pass
+            try:
+                from System.Drawing.Printing import PrintRange
+
+                if printer.PrintRange == PrintRange.SomePages:
+                    first = int(printer.FromPage)
+                    last = int(printer.ToPage)
+                    if first > 0 and last >= first:
+                        settings.PageRanges = f"{first}-{last}"
+            except Exception:
+                pass
             return core.PrintAsync(settings)
 
         return self._run_on_ui(start)
@@ -295,13 +349,16 @@ class Api:
         return {"printers": printers, "default": default}
 
     @api_method
-    def print_note(self, printer: str = "") -> dict[str, Any]:
-        if not self._wait_for_print(self._start_print(printer)):
+    def print_note(self, backgrounds: bool = True) -> dict[str, Any]:
+        task = self._start_print_dialog(bool(backgrounds))
+        if task is None:
+            return {"ok": False, "error": "print_cancelled"}
+        if not self._wait_for_print(task):
             return {"ok": False, "error": "print_failed"}
-        return {"ok": True, "printer": printer}
+        return {"ok": True}
 
     @api_method
-    def print_note_pdf(self, filename: str = "Notra.pdf") -> dict[str, Any] | None:
+    def print_note_pdf(self, filename: str = "Notra.pdf", backgrounds: bool = True) -> dict[str, Any] | None:
         if not self._window:
             return None
         safe_name = Path(str(filename or "Notra.pdf")).name or "Notra.pdf"
@@ -315,7 +372,7 @@ class Api:
         if not target:
             return None
         path = target[0] if isinstance(target, (list, tuple)) else target
-        if not self._wait_for_print(self._start_print("", str(path))):
+        if not self._wait_for_print(self._start_print(bool(backgrounds), str(path))):
             return {"ok": False, "error": "print_failed"}
         return {"ok": True, "path": str(path)}
 
