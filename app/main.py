@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ctypes
+import json
 import logging
 import os
 import shutil
@@ -53,6 +54,41 @@ def show_error(message: str) -> None:
         ctypes.windll.user32.MessageBoxW(None, message, "Notra", 0x10)
     except Exception:
         pass
+
+
+def apply_print_preferences(storage: Path) -> None:
+    """Default the WebView2 print preview to no headers/footers and print colors."""
+    prefs = storage / "EBWebView" / "Default" / "Preferences"
+    try:
+        if prefs.exists():
+            data = json.loads(prefs.read_text(encoding="utf-8"))
+        else:
+            prefs.parent.mkdir(parents=True, exist_ok=True)
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
+        printing = data.setdefault("printing", {})
+        if not isinstance(printing, dict):
+            printing = {}
+            data["printing"] = printing
+        sticky = printing.setdefault("print_preview_sticky_settings", {})
+        if not isinstance(sticky, dict):
+            sticky = {}
+            printing["print_preview_sticky_settings"] = sticky
+        try:
+            app_state = json.loads(sticky.get("appState") or "{}")
+        except (TypeError, ValueError):
+            app_state = {}
+        if not isinstance(app_state, dict):
+            app_state = {}
+        app_state["isHeaderFooterEnabled"] = False
+        app_state["isCssBackgroundEnabled"] = True
+        sticky["appState"] = json.dumps(app_state, separators=(",", ":"))
+        target = prefs.with_name("Preferences.tmp")
+        target.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
+        os.replace(target, prefs)
+    except OSError:
+        logging.getLogger(__name__).warning("Could not update print preferences")
 
 
 def refresh_webview_cache(storage: Path) -> None:
@@ -132,6 +168,7 @@ def main() -> None:
     icon = assets / "icon.ico"
     storage = directory / "webview"
     refresh_webview_cache(storage)
+    apply_print_preferences(storage)
     settings = store.settings()
 
     screen_w, screen_h = screen_size()

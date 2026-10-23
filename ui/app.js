@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
   'use strict';
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -454,7 +454,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.6'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.7'}`;
   }
 
   function applySettings() {
@@ -467,6 +467,8 @@
     document.documentElement.dataset.font = settings.font_family || 'sans';
     document.documentElement.style.setProperty('--editor-size', `${clamp(Number(settings.font_size) || 17, 13, 24)}px`);
     document.body.classList.toggle('compact-list', Boolean(settings.compact_list));
+    document.body.classList.toggle('print-no-title', settings.print_include_title === false);
+    document.body.classList.toggle('print-colors', settings.print_backgrounds !== false);
     const title = $('#note-title');
     const body = $('#note-body');
     if (title) title.spellcheck = Boolean(settings.spellcheck);
@@ -1647,7 +1649,7 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} Ã‚Â· ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.6'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.7'}`;
     } catch (error) {
       console.error(error);
     }
@@ -3163,46 +3165,20 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
 </html>`;
   }
 
-  function printOptions() {
-    const settings = state.settings || {};
-    return {
-      includeTitle: settings.print_include_title !== false,
-      backgrounds: settings.print_backgrounds !== false,
-    };
-  }
-
-  async function withPrintClasses(options, task) {
-    document.body.classList.toggle('print-no-title', !options.includeTitle);
-    document.body.classList.toggle('print-colors', options.backgrounds);
-    try {
-      return await task();
-    } finally {
-      document.body.classList.remove('print-no-title', 'print-colors');
-    }
-  }
-
-  async function printCurrentNote() {
+  function printCurrentNote() {
     if (!state.note) return;
-    if (state.dirty) await saveNow();
-    const options = printOptions();
-    try {
-      await withPrintClasses(options, () => call('print_note', options.backgrounds));
-      showToast(t('print.sent'), 'success');
-    } catch (error) {
-      if (String(error?.message || '') === 'print_cancelled') return;
-      console.error(error);
-      showToast(t('print.failed'), 'error');
-    }
+    if (state.dirty) saveNow().then(() => window.print()).catch(() => window.print());
+    else window.print();
   }
 
   async function saveNotePdf() {
     const note = state.note;
     if (!note) return;
     if (state.dirty) await saveNow();
-    const options = printOptions();
+    const backgrounds = state.settings.print_backgrounds !== false;
     const name = (note.title || t('common.untitled')).replace(/[\\/:*?"<>|]/g, ' ').trim().slice(0, 80) || 'Notra';
     try {
-      const result = await withPrintClasses(options, () => call('print_note_pdf', `${name}.pdf`, options.backgrounds));
+      const result = await call('print_note_pdf', `${name}.pdf`, backgrounds);
       if (result?.path) showToast(t('print.pdfSaved'), 'success');
     } catch (error) {
       console.error(error);
