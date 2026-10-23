@@ -12,7 +12,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
-APP_VERSION = "1.1.5"
+APP_VERSION = "1.1.6"
 APP_NAME = "Notra"
 
 DEFAULT_SETTINGS: dict[str, Any] = {
@@ -25,6 +25,8 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "spellcheck": True,
     "show_word_count": True,
     "compact_list": False,
+    "print_include_title": True,
+    "print_backgrounds": True,
     "default_view": "all",
     "window_width": 1460,
     "window_height": 940,
@@ -928,7 +930,7 @@ class Store:
             result["font_size"] = 17
         if result.get("font_family") not in {"sans", "serif", "mono"}:
             result["font_family"] = "sans"
-        for key in ("spellcheck", "show_word_count", "compact_list", "window_maximized"):
+        for key in ("spellcheck", "show_word_count", "compact_list", "print_include_title", "print_backgrounds", "window_maximized"):
             result[key] = bool(result.get(key))
         if result.get("default_view") not in {"all", "favorites", "archive"}:
             result["default_view"] = "all"

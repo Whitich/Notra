@@ -599,6 +599,20 @@
               </div>
               <label class="switch"><input type="checkbox" id="setting-compact"><span class="track"><span class="thumb"></span></span></label>
             </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.printTitle">Print note title</h3>
+                <p data-i18n="settings.printTitleHint">Include the note title at the top of the printed page.</p>
+              </div>
+              <label class="switch"><input type="checkbox" id="setting-print-title"><span class="track"><span class="thumb"></span></span></label>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.printBackgrounds">Print background colors</h3>
+                <p data-i18n="settings.printBackgroundsHint">Keep highlights, table headers and callout colors when printing.</p>
+              </div>
+              <label class="switch"><input type="checkbox" id="setting-print-backgrounds"><span class="track"><span class="thumb"></span></span></label>
+            </div>
           </section>
 
           <section class="settings-panel" data-settings-panel="editor">
@@ -690,7 +704,7 @@
               <div>
                 <h3>Notra</h3>
                 <p data-i18n="settings.aboutText">A calm, local-first home for notes, ideas and sketches.</p>
-                <span class="version-pill" id="about-version">v1.1.5</span>
+                <span class="version-pill" id="about-version">v1.1.6</span>
               </div>
             </div>
             <div class="update-card" id="update-card">
@@ -930,32 +944,6 @@
     <button type="button" class="table-tool" data-table-action="remove-column" data-i18n="table.removeColumn">− Column</button>
     <span class="table-tools-sep"></span>
     <button type="button" class="table-tool danger" data-table-action="delete" data-i18n="table.delete">Delete table</button>
-  </div>
-
-  <div class="modal print-modal" id="print-modal" hidden>
-    <div class="modal-card print-card" role="dialog" aria-modal="true" aria-labelledby="print-title">
-      <header class="modal-head">
-        <h2 id="print-title" data-i18n="print.title">Print</h2>
-      </header>
-      <div class="modal-body">
-        <label class="print-check">
-          <input type="checkbox" id="print-include-title" checked>
-          <span data-i18n="print.includeTitle">Print note title</span>
-        </label>
-        <label class="print-check">
-          <input type="checkbox" id="print-backgrounds" checked>
-          <span data-i18n="print.backgrounds">Print background colors</span>
-        </label>
-        <p class="print-hint" data-i18n="print.hint">Date, URL and page numbers are left out automatically.</p>
-      </div>
-      <div class="modal-foot">
-        <button class="btn" id="print-cancel" data-i18n="dialog.cancel">Cancel</button>
-        <div class="modal-actions">
-          <button class="btn" id="print-save-pdf" data-i18n="print.savePdf">Save as PDF</button>
-          <button class="btn primary" id="print-start" data-i18n="print.print">Print</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="modal image-modal" id="image-modal" hidden>

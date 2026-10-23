@@ -267,7 +267,7 @@
     },
     async bootstrap() {
       return {
-        app: { name: 'Notra', version: '1.1.5' },
+        app: { name: 'Notra', version: '1.1.6' },
         settings: { ...settings },
         meta: meta(),
         default_notes: sortNotes(notes.filter((note) => matchesView(note, settings.default_view, null, null, '')), settings.sort).map(hydrate)
@@ -441,10 +441,10 @@
       return stats();
     },
     async check_for_update() {
-      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.5';
+      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.6';
       return {
         ok: true,
-        current: '1.1.5',
+        current: '1.1.6',
         latest,
         available: mockUpdateAvailable,
         release_url: 'https://github.com/Whitich/Notra/releases/latest',

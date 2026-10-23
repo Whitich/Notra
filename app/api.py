@@ -277,7 +277,7 @@ class Api:
             from System.Windows.Forms import DialogResult, PrintDialog
 
             dialog = PrintDialog()
-            dialog.UseEXDialog = True
+            dialog.UseEXDialog = False
             dialog.AllowCurrentPage = True
             dialog.AllowSomePages = True
             dialog.ShowNetwork = True
