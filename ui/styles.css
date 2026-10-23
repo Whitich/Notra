@@ -1683,11 +1683,12 @@ input[type="range"]::-webkit-slider-thumb {
 /* ============================= print ============================= */
 @media print {
   html, body { background: #fff !important; color: #111 !important; overflow: visible; height: auto; }
-  .app { display: block !important; height: auto !important; overflow: visible !important; }
+  .app { display: block !important; height: auto !important; overflow: visible !important; background: #fff !important; }
   .sidebar, .list-pane, .boot, .toast-stack, .editor-topbar, .editor-toolbar-wrap, .note-meta, .editor-statusbar, .trash-banner, .modal, .overlay, .context-menu { display: none !important; }
   .editor-pane, .editor-shell, .editor-scroll { display: block !important; overflow: visible !important; height: auto !important; background: #fff !important; }
   .editor-doc { max-width: none !important; padding: 0 !important; margin: 0 !important; }
   .note-title { color: #111 !important; font-size: 28pt !important; margin-bottom: 18pt !important; -webkit-text-fill-color: #111; }
+  .note-title:placeholder-shown { display: none !important; }
   .note-body { color: #111 !important; font-size: 11.5pt !important; line-height: 1.65 !important; padding: 0 !important; min-height: 0 !important; }
   .note-body a { color: #111 !important; text-decoration: underline; }
   body:not(.print-colors) .note-body pre,
