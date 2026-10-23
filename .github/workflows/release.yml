@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish installer
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Read and verify version
+        id: version
+        shell: pwsh
+        run: |
+          $iss = Get-Content installer.iss -Raw
+          if ($iss -notmatch 'MyAppVersion\s+"([^"]+)"') { throw 'MyAppVersion not found in installer.iss' }
+          $issVersion = $Matches[1]
+
+          $store = Get-Content app/store.py -Raw
+          if ($store -notmatch 'APP_VERSION\s*=\s*"([^"]+)"') { throw 'APP_VERSION not found in app/store.py' }
+          if ($Matches[1] -ne $issVersion) { throw "Version mismatch: app/store.py=$($Matches[1]) installer.iss=$issVersion" }
+
+          $info = Get-Content version_info.txt -Raw
+          if ($info -notmatch 'filevers=\((\d+), (\d+), (\d+), \d+\)') { throw 'filevers not found in version_info.txt' }
+          $fileVersion = "$($Matches[1]).$($Matches[2]).$($Matches[3])"
+          if ($fileVersion -ne $issVersion) { throw "Version mismatch: version_info.txt=$fileVersion installer.iss=$issVersion" }
+
+          if ($env:GITHUB_REF -like 'refs/tags/v*' -and $env:GITHUB_REF_NAME.Substring(1) -ne $issVersion) {
+            throw "Tag $($env:GITHUB_REF_NAME) does not match installer version $issVersion"
+          }
+
+          Write-Host "Building Notra $issVersion"
+          "version=$issVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Build Notra and the installer
+        shell: pwsh
+        run: powershell -ExecutionPolicy Bypass -File .\build.ps1
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = "v$version"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            $assets = @(gh release view $tag --json assets --jq '.assets[].name')
+            if ($assets -contains 'Notra-Setup.exe') {
+              Write-Host "Release $tag already has the installer. Nothing to publish."
+              exit 0
+            }
+            Write-Host "Release $tag exists without the installer. Uploading it."
+            gh release upload $tag "dist/Notra-Setup.exe" --clobber
+            exit $LASTEXITCODE
+          }
+          gh release create $tag "dist/Notra-Setup.exe" --title "Notra $version" --generate-notes --latest

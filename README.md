@@ -14,8 +14,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Whitich/Notra/releases/latest/download/Notra-Setup-1.0.0.exe">
-    <img src="https://img.shields.io/badge/Download_Notra_for_Windows-Notra_Setup_1.0.0-F2B84B?style=for-the-badge&logo=windows&logoColor=1B1C20" alt="Download Notra Setup 1.0.0 for Windows">
+  <a href="https://github.com/Whitich/Notra/releases/latest/download/Notra-Setup.exe">
+    <img src="https://img.shields.io/badge/Download_Notra_for_Windows-Latest_Setup-F2B84B?style=for-the-badge&logo=windows&logoColor=1B1C20" alt="Download the latest Notra Setup for Windows">
   </a>
 </p>
 
@@ -34,9 +34,9 @@ There is no account, no cloud requirement and no telemetry. Your notes live in a
 
 ## Download
 
-Use the button above to download **Notra Setup 1.0.0** directly.
+Use the button above to download the latest **Notra Setup** directly.
 
-- Installer: `Notra-Setup-1.0.0.exe`
+- Installer: `Notra-Setup.exe`
 - Size: approximately 11.7 MB
 - Installed size: approximately 25 MB
 - Install scope: current Windows user, no administrator rights required
@@ -62,11 +62,22 @@ Use the button above to download **Notra Setup 1.0.0** directly.
 - English and Turkish interface
 - Keyboard shortcuts for everyday actions
 
+## Updating Notra
+
+Notra updates itself, so you never have to download a new installer by hand:
+
+1. An **Update** button appears at the top of the notes list when a newer version is available. Notra also checks quietly at launch and opens **Settings → About** with a **Check for updates** button at any time.
+2. When a newer release exists, Notra shows that release's notes right inside the update card.
+3. Press **Update to vX.Y.Z** and confirm. Notra saves your work, takes a database backup, downloads the installer, verifies its SHA-256 digest and runs it silently.
+4. The app closes and reopens on the new version.
+
+Your notes, notebooks, tags, settings and revision history live in `%APPDATA%\Notra` and are never touched by an update.
+
 ## System requirements
 
 - Windows 10 or Windows 11, 64-bit
 - Microsoft Edge WebView2 Runtime
-- No internet connection is required after installation
+- No internet connection is required to use Notra; only update checks contact GitHub
 
 WebView2 is included with current Windows versions and Microsoft Edge. If it is missing, install it from the [official WebView2 page](https://developer.microsoft.com/microsoft-edge/webview2/).
 
@@ -140,10 +151,21 @@ Build output:
 
 ```text
 dist\Notra\Notra.exe
-dist\Notra-Setup-1.0.0.exe
+dist\Notra-Setup.exe
 ```
 
 The build script locates Inno Setup in its standard installation folders. You can also pass `-SkipInstaller` to build only the PyInstaller app.
+
+### Publishing an update
+
+The update button reads the newest GitHub release, so every version needs a release. The `Release` workflow in `.github/workflows/release.yml` builds the installer on GitHub's Windows runners and publishes it:
+
+1. Bump the version in `app/store.py`, `installer.iss` and `version_info.txt`.
+2. Commit and push to `main` (or push a tag such as `v1.1.0`).
+3. The workflow builds `Notra-Setup.exe`, publishes it as a GitHub release and generates the release notes from your commits.
+4. Edit the release description on GitHub whenever you want to change the "What's new" list that users see in the app.
+
+If a release for the current version already exists, the workflow builds but does not publish again.
 
 ## Project structure
 
@@ -156,15 +178,12 @@ docs/           README screenshots
 build.ps1       PyInstaller and Inno Setup build script
 installer.iss   Inno Setup configuration
 notra.spec      PyInstaller configuration
+.github/        Release workflow that builds and publishes the installer
 ```
 
 ## Download verification
 
-SHA-256 for `Notra-Setup-1.0.0.exe`:
-
-```text
-0AC49CDF1B1D010557720E0B58403BCB239851D63FE0CC7FEF563AF464AB7F8B
-```
+Each GitHub release lists the SHA-256 digest of its installer next to the uploaded asset. Notra checks that digest automatically before it installs an update.
 
 ---
 

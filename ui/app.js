@@ -101,6 +101,10 @@
     fullscreen: false,
     renderedNoteId: null,
     tableCell: null,
+    updateInfo: null,
+    updateStage: 'idle',
+    updateError: '',
+    updateErrorPhase: '',
     draw: {
       setup: false,
       strokes: [],
@@ -406,6 +410,7 @@
     syncSettingsControls();
     updateSortLabel();
     updateFullscreenButton();
+    renderUpdatePanel();
   }
 
   function syncSettingsControls() {
@@ -442,7 +447,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.0.0'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.0'}`;
   }
 
   function applySettings() {
@@ -1608,6 +1613,7 @@
       panel.classList.toggle('active', panel.dataset.settingsPanel === tab);
     });
     if (tab === 'data') refreshDataPanel();
+    if (tab === 'about') renderUpdatePanel();
   }
 
   function openSettings(tab = 'general') {
@@ -1632,9 +1638,303 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} · ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.0.0'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.0'}`;
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  function updateInProgress() {
+    return ['preparing', 'checking', 'downloading', 'installing', 'restarting'].includes(state.updateStage);
+  }
+
+  function updateErrorText() {
+    const code = String(state.updateError || '');
+    if (state.updateErrorPhase === 'save') return t('update.saveFailed');
+    if (code === 'update_rate_limited') return t('update.rateLimited');
+    if (code === 'update_asset_missing') return t('update.assetMissing');
+    if (['update_digest_missing', 'update_asset_invalid', 'update_invalid_url', 'update_invalid_asset', 'update_digest_mismatch'].includes(code)) {
+      return t('update.invalidUpdate');
+    }
+    if (code === 'update_size_mismatch' || code.startsWith('update_download')) return t('update.downloadFailed');
+    if (code === 'update_installer_missing' || code === 'update_installer_invalid' || code === 'update_install_failed') {
+      return t('update.installFailed');
+    }
+    if (code === 'update_network' || code === 'update_invalid_response') {
+      return state.updateErrorPhase === 'download' ? t('update.downloadFailed') : t('update.checkFailed');
+    }
+    if (state.updateErrorPhase === 'download') return t('update.downloadFailed');
+    if (state.updateErrorPhase === 'install') return t('update.installFailed');
+    return t('update.checkFailed');
+  }
+
+  // GitHub release notes are Markdown written by a third party. Escape everything
+  // first, then only inject the small set of tags built here.
+  function renderReleaseNotes(markdown) {
+    const raw = String(markdown || '')
+      .replace(/\r\n?/g, '\n')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .trim();
+    if (!raw) return '';
+    const text = raw.length > 8000 ? `${raw.slice(0, 8000)}…` : raw;
+
+    const stash = [];
+    const keep = (html) => {
+      stash.push(html);
+      return `\u0000${stash.length - 1}\u0000`;
+    };
+    const inline = (value) => {
+      let out = escapeHtml(value);
+      out = out.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, label, href) => keep(
+        `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`
+      ));
+      out = out.replace(/`([^`\n]+)`/g, (match, code) => keep(`<code>${code}</code>`));
+      out = out.replace(/(https?:\/\/[^\s<)\u0000]+)/g, (match, url) => keep(
+        `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+      ));
+      out = out.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+      out = out.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
+      out = out.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+      out = out.replace(/(^|[\s(])_([^_\n]+)_/g, '$1<em>$2</em>');
+      return out.replace(/\u0000(\d+)\u0000/g, (match, index) => stash[Number(index)] || '');
+    };
+
+    const blocks = [];
+    let paragraph = [];
+    let listTag = '';
+    let listItems = [];
+    let codeLines = null;
+
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      blocks.push(`<p>${inline(paragraph.join(' '))}</p>`);
+      paragraph = [];
+    };
+    const flushList = () => {
+      if (listItems.length) {
+        blocks.push(`<${listTag}>${listItems.map((item) => `<li>${inline(item)}</li>`).join('')}</${listTag}>`);
+      }
+      listItems = [];
+      listTag = '';
+    };
+    const flushAll = () => {
+      flushParagraph();
+      flushList();
+    };
+
+    for (const rawLine of text.split('\n')) {
+      const line = rawLine.trimEnd();
+      const trimmed = line.trim();
+      if (codeLines) {
+        if (/^```/.test(trimmed)) {
+          blocks.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`);
+          codeLines = null;
+        } else {
+          codeLines.push(line);
+        }
+        continue;
+      }
+      if (/^```/.test(trimmed)) {
+        flushAll();
+        codeLines = [];
+        continue;
+      }
+      if (!trimmed) {
+        flushAll();
+        continue;
+      }
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+        flushAll();
+        blocks.push('<hr>');
+        continue;
+      }
+      const heading = trimmed.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) {
+        flushAll();
+        const level = Math.min(heading[1].length + 2, 5);
+        blocks.push(`<h${level}>${inline(heading[2].replace(/\s+#+\s*$/, ''))}</h${level}>`);
+        continue;
+      }
+      if (/^>\s?/.test(trimmed)) {
+        flushAll();
+        blocks.push(`<blockquote>${inline(trimmed.replace(/^>\s?/, ''))}</blockquote>`);
+        continue;
+      }
+      const bullet = trimmed.match(/^[-*+]\s+(.+)$/);
+      if (bullet) {
+        flushParagraph();
+        if (listTag && listTag !== 'ul') flushList();
+        listTag = 'ul';
+        listItems.push(bullet[1].replace(/^\[( |x|X)\]\s+/, (match, mark) => (String(mark).toLowerCase() === 'x' ? '☑ ' : '☐ ')));
+        continue;
+      }
+      const ordered = trimmed.match(/^\d+[.)]\s+(.+)$/);
+      if (ordered) {
+        flushParagraph();
+        if (listTag && listTag !== 'ol') flushList();
+        listTag = 'ol';
+        listItems.push(ordered[1]);
+        continue;
+      }
+      if (listTag) flushList();
+      paragraph.push(trimmed);
+    }
+    if (codeLines) blocks.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`);
+    flushAll();
+    return blocks.join('');
+  }
+
+  function renderUpdatePanel() {
+    const button = $('#update-action');
+    if (!button) return;
+    const label = $('#update-action-label');
+    const status = $('#update-status');
+    const badge = $('#update-badge');
+    const progress = $('#update-progress');
+    const info = state.updateInfo;
+    const available = Boolean(info?.available);
+    const busy = updateInProgress();
+    let labelText = t('update.checkButton');
+    let statusText = t('update.idle');
+
+    if (state.updateStage === 'checking') {
+      labelText = t('update.checkingButton');
+      statusText = t('update.checking');
+    } else if (state.updateStage === 'preparing') {
+      labelText = t('update.preparingButton');
+      statusText = t('update.preparing');
+    } else if (state.updateStage === 'downloading') {
+      labelText = t('update.downloadingButton');
+      statusText = t('update.downloading');
+    } else if (state.updateStage === 'installing' || state.updateStage === 'restarting') {
+      labelText = t('update.installingButton');
+      statusText = state.updateStage === 'restarting' ? t('update.restarting') : t('update.installing');
+    } else if (state.updateError) {
+      statusText = updateErrorText();
+      if (available) labelText = t('update.updateButton', { version: info.latest });
+    } else if (info?.available) {
+      labelText = t('update.updateButton', { version: info.latest });
+      statusText = t('update.available', { version: info.latest });
+    } else if (info) {
+      statusText = t('update.upToDate', { version: info.current || state.app?.version || '' });
+    }
+
+    button.disabled = busy;
+    button.classList.toggle('primary', available);
+    if (label) label.textContent = labelText;
+    if (status) status.textContent = statusText;
+    if (badge) {
+      badge.hidden = !(available && !busy);
+      badge.textContent = t('update.badge');
+      badge.title = t('update.badgeTitle');
+    }
+    if (progress) progress.hidden = state.updateStage !== 'downloading';
+
+    const notesBox = $('#update-notes');
+    const notesBody = $('#update-notes-body');
+    const showNotes = Boolean(available && info && !busy);
+    if (notesBox) notesBox.hidden = !showNotes;
+    if (notesBody) {
+      if (showNotes) {
+        const html = renderReleaseNotes(info.notes);
+        notesBody.innerHTML = html || `<p class="update-notes-empty">${escapeHtml(t('update.notesEmpty'))}</p>`;
+      } else {
+        notesBody.innerHTML = '';
+      }
+    }
+    if (showNotes) {
+      const notesTitle = $('#update-notes-title');
+      if (notesTitle) notesTitle.textContent = t('update.notesTitle', { version: info.latest });
+      const notesLink = $('#update-notes-link');
+      if (notesLink) {
+        const url = String(info.release_url || '');
+        notesLink.hidden = !/^https:\/\//i.test(url);
+        if (!notesLink.hidden) notesLink.href = url;
+      }
+    }
+
+    const settingsButton = $('#settings-btn');
+    if (settingsButton) {
+      settingsButton.classList.toggle('has-update', available && !busy);
+      if (available && !busy) settingsButton.title = t('update.badgeTitle');
+      else settingsButton.removeAttribute('title');
+    }
+    const chip = $('#update-chip');
+    if (chip) {
+      chip.hidden = !(available && !busy);
+      if (available) chip.title = t('update.updateButton', { version: info?.latest || '' });
+      else chip.removeAttribute('title');
+      const chipLabel = $('#update-chip-label');
+      if (chipLabel) chipLabel.textContent = t('update.chipLabel');
+    }
+  }
+
+  async function checkForUpdates(options = {}) {
+    if (updateInProgress()) return null;
+    state.updateStage = 'checking';
+    state.updateError = '';
+    state.updateErrorPhase = '';
+    renderUpdatePanel();
+    try {
+      const info = await call('check_for_update');
+      state.updateInfo = info;
+      state.updateStage = 'idle';
+      state.updateError = '';
+      state.updateErrorPhase = '';
+      renderUpdatePanel();
+      return info;
+    } catch (error) {
+      console.error(error);
+      state.updateStage = options.silent ? 'idle' : 'error';
+      state.updateError = options.silent ? '' : (error?.message || 'update_network');
+      state.updateErrorPhase = options.silent ? '' : 'check';
+      renderUpdatePanel();
+      return null;
+    }
+  }
+
+  async function waitForSave() {
+    for (let i = 0; i < 50 && state.saving; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    if (state.dirty && !state.saving) await saveNow();
+    for (let i = 0; i < 50 && state.saving; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    return !state.saving && !state.dirty;
+  }
+
+  async function installUpdate() {
+    const info = state.updateInfo;
+    const asset = info?.asset;
+    if (!info?.available || !asset?.url) return checkForUpdates();
+    if (updateInProgress()) return;
+    let phase = 'save';
+    state.updateStage = 'preparing';
+    state.updateError = '';
+    state.updateErrorPhase = '';
+    renderUpdatePanel();
+    try {
+      const saved = await waitForSave();
+      if (!saved) throw new Error('update_save_failed');
+      phase = 'download';
+      state.updateStage = 'downloading';
+      renderUpdatePanel();
+      const downloaded = await call('download_update', asset.url, asset.name, asset.size, asset.digest);
+      if (!downloaded?.path) throw new Error('update_download_failed');
+      phase = 'install';
+      state.updateStage = 'installing';
+      renderUpdatePanel();
+      const installed = await call('install_update', downloaded.path);
+      if (!installed?.started) throw new Error('update_install_failed');
+      state.updateStage = 'restarting';
+      renderUpdatePanel();
+    } catch (error) {
+      console.error(error);
+      state.updateStage = 'error';
+      state.updateError = error?.message || 'update_install_failed';
+      state.updateErrorPhase = phase;
+      renderUpdatePanel();
     }
   }
 
@@ -3414,6 +3714,9 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
       const app = $('#app');
       if (app) app.setAttribute('aria-hidden', 'false');
       revealApp();
+      window.setTimeout(() => {
+        if (state.booted && !state.updateInfo && !updateInProgress()) checkForUpdates({ silent: true });
+      }, 1800);
     } catch (error) {
       state.booted = false;
       showBootError(error);
@@ -3812,6 +4115,21 @@ hr{border:0;border-top:1px solid #ddd9d0;margin:28px 0}
     });
 
     $('#open-data-folder')?.addEventListener('click', () => call('open_data_dir').catch(() => {}));
+    $('#update-action')?.addEventListener('click', () => {
+      if (state.updateInfo?.available) installUpdate();
+      else checkForUpdates();
+    });
+    $('#update-chip')?.addEventListener('click', async () => {
+      const info = state.updateInfo;
+      if (!info?.available || updateInProgress()) return;
+      const confirmed = await showConfirm({
+        title: t('update.confirmTitle', { version: info.latest }),
+        body: t('update.confirmBody'),
+        okLabel: t('update.updateButton', { version: info.latest }),
+        tone: 'primary',
+      });
+      if (confirmed) installUpdate();
+    });
     $('#export-backup-btn')?.addEventListener('click', exportBackup);
     $('#import-backup-btn')?.addEventListener('click', importBackup);
     $('#open-stats-btn')?.addEventListener('click', openStats);

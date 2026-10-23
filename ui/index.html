@@ -176,9 +176,15 @@
             <h1 id="view-title">All notes</h1>
             <span class="view-subtitle" id="view-subtitle"></span>
           </div>
-          <button class="icon-btn primary" id="new-note-btn" data-i18n-title="list.newNote" title="New note" aria-label="New note">
-            <svg class="icon"><use href="#i-plus"></use></svg>
-          </button>
+          <div class="list-heading-actions">
+            <button class="update-chip" id="update-chip" hidden>
+              <svg class="icon"><use href="#i-download"></use></svg>
+              <span id="update-chip-label">Update</span>
+            </button>
+            <button class="icon-btn primary" id="new-note-btn" data-i18n-title="list.newNote" title="New note" aria-label="New note">
+              <svg class="icon"><use href="#i-plus"></use></svg>
+            </button>
+          </div>
         </div>
         <div class="search-box" id="search-box">
           <svg class="icon search-icon"><use href="#i-search"></use></svg>
@@ -684,8 +690,29 @@
               <div>
                 <h3>Notra</h3>
                 <p data-i18n="settings.aboutText">A calm, local-first home for notes, ideas and sketches.</p>
-                <span class="version-pill" id="about-version">v1.0.0</span>
+                <span class="version-pill" id="about-version">v1.1.0</span>
               </div>
+            </div>
+            <div class="update-card" id="update-card">
+              <div class="update-copy">
+                <div class="update-heading">
+                  <h3 data-i18n="update.title">Software updates</h3>
+                  <span class="update-badge" id="update-badge" hidden data-i18n="update.badge">Update available</span>
+                </div>
+                <p class="update-status" id="update-status" data-i18n="update.idle">Check for updates. Your notes and settings stay on this device.</p>
+                <div class="update-progress" id="update-progress" hidden><span></span></div>
+                <div class="update-notes" id="update-notes" hidden>
+                  <div class="update-notes-head">
+                    <span class="update-notes-title" id="update-notes-title" data-i18n="update.notesTitle">What's new</span>
+                    <a class="update-notes-link" id="update-notes-link" href="https://github.com/Whitich/Notra/releases" target="_blank" rel="noopener noreferrer" hidden data-i18n="update.releasePage">Release page</a>
+                  </div>
+                  <div class="update-notes-body" id="update-notes-body"></div>
+                </div>
+              </div>
+              <button class="btn" id="update-action">
+                <svg class="icon"><use href="#i-download"></use></svg>
+                <span id="update-action-label" data-i18n="update.checkButton">Check for updates</span>
+              </button>
             </div>
             <div class="about-grid">
               <button class="about-card" id="about-shortcuts">

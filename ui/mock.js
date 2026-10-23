@@ -259,11 +259,15 @@
   });
 
   const samplePng = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  let mockUpdateAvailable = new URLSearchParams(window.location.search).has('update');
 
   window.NotraMock = {
+    setUpdateAvailable(value) {
+      mockUpdateAvailable = Boolean(value);
+    },
     async bootstrap() {
       return {
-        app: { name: 'Notra', version: '1.0.0' },
+        app: { name: 'Notra', version: '1.1.0' },
         settings: { ...settings },
         meta: meta(),
         default_notes: sortNotes(notes.filter((note) => matchesView(note, settings.default_view, null, null, '')), settings.sort).map(hydrate)
@@ -435,6 +439,38 @@
     },
     async get_stats() {
       return stats();
+    },
+    async check_for_update() {
+      const latest = mockUpdateAvailable ? '9.9.9' : '1.1.0';
+      return {
+        ok: true,
+        current: '1.1.0',
+        latest,
+        available: mockUpdateAvailable,
+        release_url: 'https://github.com/Whitich/Notra/releases/latest',
+        notes: [
+          "## What's changed",
+          '',
+          '- **Faster startup** and smoother scrolling in long notes',
+          '- New table tools: add or remove rows and columns, move between cells with `Tab`',
+          '- The update button now lives in **Settings → About** and keeps your notes and settings',
+          '- Fixed: images disappearing after pasting from the clipboard',
+          '',
+          '**Full Changelog**: https://github.com/Whitich/Notra/compare/v1.0.0...v1.1.0'
+        ].join('\n'),
+        asset: {
+          name: 'Notra-Setup.exe',
+          url: 'https://github.com/Whitich/Notra/releases/download/v9.9.9/Notra-Setup.exe',
+          size: 12226573,
+          digest: `sha256:${'0'.repeat(64)}`
+        }
+      };
+    },
+    async download_update(url, name) {
+      return { ok: true, path: `C:\\Users\\Mock\\AppData\\Local\\Temp\\Notra\\Updates\\${name}`, cached: false };
+    },
+    async install_update() {
+      return { ok: true, started: true };
     },
     async pick_images() {
       return [{ name: 'mock-sketch.png', mime: 'image/png', data_url: samplePng, size: 68 }];

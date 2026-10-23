@@ -39,7 +39,7 @@ if (-not $SkipInstaller) {
     if ($LASTEXITCODE -ne 0) {
         throw "Inno Setup failed with exit code $LASTEXITCODE"
     }
-    $setup = "$root\dist\Notra-Setup-1.0.0.exe"
+    $setup = "$root\dist\Notra-Setup.exe"
     if (-not (Test-Path -LiteralPath $setup)) {
         throw "Installer output not found: $setup"
     }

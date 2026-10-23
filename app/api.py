@@ -7,11 +7,13 @@ import json
 import logging
 import mimetypes
 import os
+import threading
 from pathlib import Path
 from typing import Any, Callable
 
 import webview
 
+from . import updater
 from .store import APP_NAME, APP_VERSION, Store
 
 logger = logging.getLogger("notra.api")
@@ -315,6 +317,42 @@ class Api:
     def reveal_db(self) -> bool:
         os.startfile(str(self._store.db_path))  # type: ignore[attr-defined]
         return True
+
+    @api_method
+    def check_for_update(self) -> dict[str, Any]:
+        return updater.check_for_update(APP_VERSION)
+
+    @api_method
+    def download_update(
+        self,
+        url: str,
+        name: str,
+        size: int,
+        digest: str,
+    ) -> dict[str, Any]:
+        return updater.download_update(url, name, size, digest)
+
+    @api_method
+    def install_update(self, path: str) -> dict[str, Any]:
+        result = updater.launch_installer(path)
+        if not result.get("ok"):
+            return result
+        try:
+            self._store.auto_backup()
+        except Exception:
+            logger.exception("Pre-update backup failed")
+        timer = threading.Timer(1.8, self._close_for_update)
+        timer.daemon = True
+        timer.start()
+        return result
+
+    def _close_for_update(self) -> None:
+        if not self._window:
+            return
+        try:
+            self._window.destroy()
+        except Exception:
+            logger.exception("Could not close Notra for update")
 
     @api_method
     def app_info(self) -> dict[str, Any]:

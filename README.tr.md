@@ -14,8 +14,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Whitich/Notra/releases/latest/download/Notra-Setup-1.0.0.exe">
-    <img src="https://img.shields.io/badge/Notra'y%C4%B1_%C4%B0ndir-Windows_%C4%B0%C3%A7in_Setup_1.0.0-F2B84B?style=for-the-badge&logo=windows&logoColor=1B1C20" alt="Windows için Notra Setup 1.0.0 indir">
+  <a href="https://github.com/Whitich/Notra/releases/latest/download/Notra-Setup.exe">
+    <img src="https://img.shields.io/badge/Notra'y%C4%B1_%C4%B0ndir-Windows_%C4%B0%C3%A7in_Son_S%C3%BCr%C3%BCm-F2B84B?style=for-the-badge&logo=windows&logoColor=1B1C20" alt="Windows için son Notra sürümünü indir">
   </a>
 </p>
 
@@ -34,9 +34,9 @@ Hesap, bulut zorunluluğu veya telemetri yoktur. Notlarınız bilgisayarınızda
 
 ## İndirme
 
-Yukarıdaki butonla **Notra Setup 1.0.0** sürümünü doğrudan indirebilirsiniz.
+Yukarıdaki butonla son **Notra Setup** sürümünü doğrudan indirebilirsiniz.
 
-- Kurulum dosyası: `Notra-Setup-1.0.0.exe`
+- Kurulum dosyası: `Notra-Setup.exe`
 - Boyut: yaklaşık 11,7 MB
 - Kurulu boyut: yaklaşık 25 MB
 - Kurulum kapsamı: yalnızca mevcut Windows kullanıcısı, yönetici izni gerekmez
@@ -62,11 +62,22 @@ Yukarıdaki butonla **Notra Setup 1.0.0** sürümünü doğrudan indirebilirsini
 - İngilizce ve Türkçe arayüz
 - Günlük işler için klavye kısayolları
 
+## Güncellemeler
+
+Notra kendini güncelleyebilir; yeni kurulum dosyasını elle indirmeniz gerekmez:
+
+1. Yeni bir sürüm olduğunda not listesinin üstünde bir **Güncelle** düğmesi görünür. Notra açılışta da sessizce kontrol eder; dilediğiniz zaman **Ayarlar → Hakkında** bölümünden **Güncellemeleri kontrol et** düğmesini kullanabilirsiniz.
+2. Yeni bir sürüm varsa, o sürümün notları doğrudan güncelleme kartında görünür.
+3. **vX.Y.Z sürümüne güncelle** düğmesine basıp onaylayın. Notra çalışmanızı kaydeder, veritabanı yedeği alır, kurulum dosyasını indirir, SHA-256 özetini doğrular ve sessizce çalıştırır.
+4. Uygulama kapanır ve yeni sürümle yeniden açılır.
+
+Notlarınız, defterleriniz, etiketleriniz, ayarlarınız ve sürüm geçmişiniz `%APPDATA%\Notra` klasöründe durur ve güncelleme sırasında dokunulmaz.
+
 ## Sistem gereksinimleri
 
 - Windows 10 veya Windows 11, 64 bit
 - Microsoft Edge WebView2 Runtime
-- Kurulumdan sonra internet bağlantısı gerekmez
+- Notra'yı kullanmak için internet bağlantısı gerekmez; yalnızca güncelleme kontrolü GitHub'a bağlanır
 
 WebView2 güncel Windows sürümlerinde ve Microsoft Edge ile birlikte gelir. Eksikse [WebView2 resmi sayfasından](https://developer.microsoft.com/microsoft-edge/webview2/) kurabilirsiniz.
 
@@ -140,10 +151,21 @@ Derleme çıktıları:
 
 ```text
 dist\Notra\Notra.exe
-dist\Notra-Setup-1.0.0.exe
+dist\Notra-Setup.exe
 ```
 
 Derleme betiği Inno Setup'ı standart kurulum klasörlerinde arar. Yalnızca PyInstaller uygulamasını derlemek için `-SkipInstaller` parametresini kullanabilirsiniz.
+
+### Güncelleme yayınlama
+
+Güncelleme düğmesi GitHub'daki en yeni sürümü okur, bu yüzden her sürüm için bir release gerekir. `.github/workflows/release.yml` içindeki `Release` iş akışı kurulum dosyasını GitHub'ın Windows sunucularında derleyip yayınlar:
+
+1. Sürümü `app/store.py`, `installer.iss` ve `version_info.txt` dosyalarında artırın.
+2. Değişikliği `main` dalına commit edip gönderin (veya `v1.1.0` gibi bir etiket gönderin).
+3. İş akışı `Notra-Setup.exe` dosyasını derler, GitHub release'i olarak yayınlar ve sürüm notlarını commit'lerinizden oluşturur.
+4. Uygulamada kullanıcıların gördüğü "Yenilikler" listesini değiştirmek isterseniz release açıklamasını GitHub üzerinden düzenleyin.
+
+Geçerli sürüm için zaten bir release varsa iş akışı derleme yapar ancak yeniden yayınlamaz.
 
 ## Proje yapısı
 
@@ -156,15 +178,12 @@ docs/           README ekran görüntüleri
 build.ps1       PyInstaller ve Inno Setup derleme betiği
 installer.iss   Inno Setup yapılandırması
 notra.spec      PyInstaller yapılandırması
+.github/        Kurulum dosyasını derleyip yayınlayan release iş akışı
 ```
 
 ## İndirme doğrulama
 
-`Notra-Setup-1.0.0.exe` için SHA-256:
-
-```text
-0AC49CDF1B1D010557720E0B58403BCB239851D63FE0CC7FEF563AF464AB7F8B
-```
+Her GitHub release'i, yüklenen kurulum dosyasının yanında SHA-256 özetini listeler. Notra bir güncellemeyi kurmadan önce bu özeti otomatik olarak doğrular.
 
 ---
 
