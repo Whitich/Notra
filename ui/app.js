@@ -454,7 +454,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.10'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.11'}`;
   }
 
   function applySettings() {
@@ -1649,7 +1649,7 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} Ã‚Â· ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.10'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.11'}`;
     } catch (error) {
       console.error(error);
     }
@@ -2417,6 +2417,8 @@
     const toolbar = document.createElement('div');
     toolbar.className = 'image-toolbar';
     toolbar.innerHTML = [
+      `<span class="image-size-field"><input id="image-size-input" type="number" min="${IMAGE_MIN_WIDTH}" step="1" inputmode="numeric" title="${escapeHtml(t('image.width'))}" aria-label="${escapeHtml(t('image.width'))}"><span>px</span></span>`,
+      '<span class="image-toolbar-sep"></span>',
       `<button type="button" data-image-align="left" title="${escapeHtml(t('image.alignLeft'))}" aria-label="${escapeHtml(t('image.alignLeft'))}"><svg class="icon"><use href="#i-align-left"></use></svg></button>`,
       `<button type="button" data-image-align="center" title="${escapeHtml(t('image.alignCenter'))}" aria-label="${escapeHtml(t('image.alignCenter'))}"><svg class="icon"><use href="#i-align-center"></use></svg></button>`,
       `<button type="button" data-image-align="right" title="${escapeHtml(t('image.alignRight'))}" aria-label="${escapeHtml(t('image.alignRight'))}"><svg class="icon"><use href="#i-align-right"></use></svg></button>`,
@@ -2424,9 +2426,22 @@
       `<button type="button" data-image-reset title="${escapeHtml(t('image.resetSize'))}" aria-label="${escapeHtml(t('image.resetSize'))}"><svg class="icon"><use href="#i-expand"></use></svg></button>`
     ].join('');
     frame.appendChild(toolbar);
+    const sizeInput = toolbar.querySelector('#image-size-input');
+    sizeInput?.addEventListener('input', () => applyImageWidth(sizeInput.value));
+    sizeInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        applyImageWidth(sizeInput.value);
+        sizeInput.blur();
+      } else if (event.key === 'Escape') {
+        sizeInput.blur();
+      }
+    });
+    sizeInput?.addEventListener('focus', () => sizeInput.select());
+    sizeInput?.addEventListener('blur', () => syncImageSizeInput());
     frame.addEventListener('pointerdown', (event) => {
       if (event.target.closest('.image-toolbar')) {
-        event.preventDefault();
+        if (!event.target.closest('input')) event.preventDefault();
         return;
       }
       const handle = event.target.closest('[data-handle]');
@@ -2472,6 +2487,31 @@
     frame.style.width = `${rect.width}px`;
     frame.style.height = `${rect.height}px`;
     frame.classList.toggle('toolbar-below', rect.top < 74);
+    syncImageSizeInput();
+  }
+
+  function syncImageSizeInput() {
+    const img = state.imageSelection;
+    const input = $('#image-size-input');
+    if (!img || !input) return;
+    const width = Math.round(img.getBoundingClientRect().width);
+    if (document.activeElement !== input) input.value = String(width);
+    input.max = String(Math.round(imageEditorWidth()));
+  }
+
+  function applyImageWidth(value) {
+    const img = state.imageSelection;
+    if (!img) return;
+    const parsed = Number(String(value).replace(',', '.'));
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      syncImageSizeInput();
+      return;
+    }
+    const width = clamp(parsed, IMAGE_MIN_WIDTH, imageEditorWidth());
+    img.style.width = `${Math.round(width)}px`;
+    img.style.removeProperty('height');
+    markDirty();
+    positionImageFrame();
   }
 
   function selectImage(img) {
