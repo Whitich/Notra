@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.env
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.bak
+.DS_Store
+Thumbs.db

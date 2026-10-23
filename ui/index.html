@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-accent="amber" data-font="sans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Notra</title>
+  <link rel="icon" href="assets/icon.ico">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg aria-hidden="true" class="svg-sprite">
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5"/><path d="M10 12h5M10 16h5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.4l6.1-.9z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.3V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.7a2 2 0 0 0-1.1-1.8l-1.8-.9A2 2 0 0 1 15 10.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10h14V9"/><path d="M10 13h4"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m6 6 1 15h10l1-15"/><path d="M10 10v7M14 10v7"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.6 12 22l-9-9V4h9l8.6 8.6a1.4 1.4 0 0 1 0 2z"/><circle cx="7.5" cy="8.5" r="1.3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8z"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+    <symbol id="i-bold" viewBox="0 0 24 24"><path d="M6 4h7a4 4 0 0 1 0 8H6z"/><path d="M6 12h8a4 4 0 0 1 0 8H6z"/></symbol>
+    <symbol id="i-italic" viewBox="0 0 24 24"><path d="M19 4h-9M14 20H5M15 4 9 20"/></symbol>
+    <symbol id="i-underline" viewBox="0 0 24 24"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><path d="M4 21h16"/></symbol>
+    <symbol id="i-strike" viewBox="0 0 24 24"><path d="M16 4H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H7"/><path d="M4 12h16"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="i-list-ordered" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 5h1v4M4 9h2M4 14.5c0-.8.6-1.5 1.5-1.5S7 13.7 7 14.5 4 16 4 18h3"/></symbol>
+    <symbol id="i-checklist" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="5" rx="1"/><path d="m4.5 6.5 1.2 1.2L7.5 5.5"/><rect x="3" y="15" width="5" height="5" rx="1"/><path d="M11 6.5h10M11 17.5h10"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M10 11H6a1 1 0 0 1-1-1V7a3 3 0 0 1 3-3h1v4H7v1h3zM19 11h-4a1 1 0 0 1-1-1V7a3 3 0 0 1 3-3h1v4h-2v1h3z"/><path d="M6 11v3a3 3 0 0 0 3 3M15 11v3a3 3 0 0 0 3 3"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L20 8a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+    <symbol id="i-marker" viewBox="0 0 24 24"><path d="m9 11 4-4 5 5-4 4z"/><path d="m9 11-3 3v3h3l3-3"/><path d="M4 21h16"/><path d="m13 7 3-3 4 4-3 3"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4-4 10-10a2 2 0 0 1 3 0l4 4a2 2 0 0 1 0 3L13 21z"/><path d="m9 9 6 6M7 21h14"/></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16M15 4v16"/></symbol>
+    <symbol id="i-divider" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M7 7h10M7 17h10"/></symbol>
+    <symbol id="i-align-left" viewBox="0 0 24 24"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></symbol>
+    <symbol id="i-align-center" viewBox="0 0 24 24"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></symbol>
+    <symbol id="i-align-right" viewBox="0 0 24 24"><path d="M4 6h16M10 10h10M4 14h16M10 18h10"/></symbol>
+    <symbol id="i-indent" viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10"/><path d="m4 9 3 3-3 3"/></symbol>
+    <symbol id="i-outdent" viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10"/><path d="m7 9-3 3 3 3"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7H4v-5"/><path d="M4 7a8 8 0 1 1 1.5 12.5"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 7h5v-5"/><path d="M20 7A8 8 0 1 0 18.5 19.5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a2 2 0 0 1 0-4h6.5A2.5 2.5 0 0 0 21 9.5 9 9 0 0 0 12 3z"/><circle cx="7.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h6a2 2 0 0 1 2 2v1"/><path d="M3 19V9h18l-2 10z"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
+    <symbol id="i-restore" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></symbol>
+    <symbol id="i-row" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 12h18"/><path d="M12 8v8M9 13l3 3 3-3"/></symbol>
+    <symbol id="i-column" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/><path d="M8 12h8M13 9l3 3-3 3"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M8 6h12M8 12h9M8 18h6"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5"/><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 14h10v7H7z"/><path d="M17 11h.01"/></symbol>
+    <symbol id="i-command" viewBox="0 0 24 24"><path d="M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 2.5 18a2 2 0 0 0 1.8 3h15.4a2 2 0 0 0 1.8-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/></symbol>
+    <symbol id="i-move" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-select" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><path d="m5 6.5 1.3 1.3L8 5.5"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2z"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4"/><path d="M8.5 14.5a6 6 0 1 1 7 0c-.7.6-1.5 1.4-1.5 2.5h-4c0-1.1-.8-1.9-1.5-2.5z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  </svg>
+
+  <div id="boot" class="boot">
+    <div class="boot-glow"></div>
+    <img src="assets/icon.png" class="boot-logo" alt="">
+    <div class="boot-name">Notra</div>
+    <div class="boot-spinner"></div>
+    <p class="boot-text" data-i18n="dialog.loading">Opening your notes…</p>
+    <div id="boot-error" class="boot-error" hidden>
+      <p id="boot-error-text" data-i18n="dialog.loadError">Notra could not connect to its local data engine.</p>
+      <button id="boot-retry" class="btn primary" data-i18n="dialog.retry">Retry</button>
+    </div>
+  </div>
+
+  <div id="app" class="app" aria-hidden="true">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="assets/icon.png" alt="" class="brand-mark">
+        <div class="brand-copy">
+          <div class="brand-name">Notra</div>
+          <div class="brand-tagline" data-i18n="app.tagline">Notes, ideas &amp; sketches</div>
+        </div>
+        <button class="icon-btn brand-focus" id="brand-focus-btn" data-i18n-title="editor.focus" title="Focus mode" aria-label="Focus mode">
+          <svg class="icon"><use href="#i-focus"></use></svg>
+        </button>
+      </div>
+
+      <nav class="nav" id="primary-nav">
+        <button class="side-item nav-item" data-view="all">
+          <svg class="icon"><use href="#i-note"></use></svg>
+          <span class="side-label" data-i18n="nav.all">All notes</span>
+          <span class="count" data-count="all">0</span>
+        </button>
+        <button class="side-item nav-item" data-view="favorites">
+          <svg class="icon"><use href="#i-star"></use></svg>
+          <span class="side-label" data-i18n="nav.favorites">Favorites</span>
+          <span class="count" data-count="favorites">0</span>
+        </button>
+        <button class="side-item nav-item" data-view="archive">
+          <svg class="icon"><use href="#i-archive"></use></svg>
+          <span class="side-label" data-i18n="nav.archive">Archive</span>
+          <span class="count" data-count="archive">0</span>
+        </button>
+        <button class="side-item nav-item" data-view="trash">
+          <svg class="icon"><use href="#i-trash"></use></svg>
+          <span class="side-label" data-i18n="nav.trash">Trash</span>
+          <span class="count" data-count="trash">0</span>
+        </button>
+      </nav>
+
+      <div class="side-scroll">
+        <section class="side-section">
+          <div class="side-heading">
+            <span data-i18n="nav.notebooks">Notebooks</span>
+            <button class="mini-btn" id="new-group-btn" data-i18n-title="nav.newNotebook" title="New notebook" aria-label="New notebook">
+              <svg class="icon"><use href="#i-plus"></use></svg>
+            </button>
+          </div>
+          <div class="side-list" id="group-list"></div>
+          <div class="side-empty" id="group-empty" hidden data-i18n="nav.noNotebooks">No notebooks yet</div>
+        </section>
+
+        <section class="side-section tags-section">
+          <div class="side-heading">
+            <span data-i18n="nav.tags">Tags</span>
+          </div>
+          <div class="tag-list" id="tag-list"></div>
+          <div class="side-empty" id="tag-empty" hidden data-i18n="nav.noTags">No tags yet</div>
+        </section>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="side-item footer-item" id="language-btn" data-i18n-title="nav.language" title="Switch language">
+          <svg class="icon"><use href="#i-globe"></use></svg>
+          <span class="side-label" id="language-label">English</span>
+          <span class="mini-code" id="language-code">EN</span>
+        </button>
+        <button class="side-item footer-item" id="settings-btn">
+          <svg class="icon"><use href="#i-settings"></use></svg>
+          <span class="side-label" data-i18n="nav.settings">Settings</span>
+          <kbd class="side-kbd">Ctrl ,</kbd>
+        </button>
+      </div>
+    </aside>
+
+    <section class="list-pane" id="list-pane">
+      <header class="list-header">
+        <div class="list-heading">
+          <div class="view-heading-copy">
+            <h1 id="view-title">All notes</h1>
+            <span class="view-subtitle" id="view-subtitle"></span>
+          </div>
+          <button class="icon-btn primary" id="new-note-btn" data-i18n-title="list.newNote" title="New note" aria-label="New note">
+            <svg class="icon"><use href="#i-plus"></use></svg>
+          </button>
+        </div>
+        <div class="search-box" id="search-box">
+          <svg class="icon search-icon"><use href="#i-search"></use></svg>
+          <input id="search-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="list.search" placeholder="Search notes…">
+          <button class="search-clear" id="search-clear" hidden data-i18n-title="list.clearSearch" title="Clear search" aria-label="Clear search">
+            <svg class="icon"><use href="#i-close"></use></svg>
+          </button>
+          <kbd class="search-kbd">Ctrl F</kbd>
+        </div>
+        <div class="list-toolbar" id="list-toolbar">
+          <button class="ghost-btn" id="sort-btn">
+            <svg class="icon"><use href="#i-sort"></use></svg>
+            <span id="sort-label">Last edited</span>
+            <svg class="icon tiny"><use href="#i-chevron-down"></use></svg>
+          </button>
+          <button class="ghost-btn" id="select-all-btn" data-i18n-title="list.selectAll" title="Select all">
+            <svg class="icon"><use href="#i-select"></use></svg>
+            <span data-i18n="list.selectAll">Select all</span>
+          </button>
+          <button class="ghost-btn danger-on-hover" id="empty-trash-btn" hidden>
+            <svg class="icon"><use href="#i-trash"></use></svg>
+            <span data-i18n="list.emptyTrash">Empty trash</span>
+          </button>
+        </div>
+        <div class="bulk-bar" id="bulk-bar" hidden>
+          <span class="bulk-count" id="bulk-count">0 selected</span>
+          <div class="bulk-actions">
+            <button class="mini-btn" data-bulk="move" data-i18n-title="list.move" title="Move">
+              <svg class="icon"><use href="#i-move"></use></svg>
+            </button>
+            <button class="mini-btn" data-bulk="favorite" data-i18n-title="list.favorite" title="Favorite">
+              <svg class="icon"><use href="#i-star"></use></svg>
+            </button>
+            <button class="mini-btn" data-bulk="archive" data-i18n-title="list.archive" title="Archive">
+              <svg class="icon"><use href="#i-archive"></use></svg>
+            </button>
+            <button class="mini-btn danger" data-bulk="delete" data-i18n-title="list.deleteForever" title="Delete forever">
+              <svg class="icon"><use href="#i-trash"></use></svg>
+            </button>
+            <span class="bulk-sep"></span>
+            <button class="mini-btn" id="bulk-clear" data-i18n-title="list.clearSelection" title="Clear selection">
+              <svg class="icon"><use href="#i-close"></use></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+      <div class="list-scroll" id="list-scroll">
+        <div class="note-list" id="note-list" role="list"></div>
+        <div class="list-empty" id="list-empty" hidden>
+          <div class="empty-mark"><svg class="icon"><use href="#i-note"></use></svg></div>
+          <h2 id="list-empty-title"></h2>
+          <p id="list-empty-body"></p>
+          <button class="btn subtle" id="list-empty-action" hidden></button>
+        </div>
+      </div>
+      <footer class="list-footer"><span id="list-footer-text"></span></footer>
+    </section>
+
+    <main class="editor-pane" id="editor-pane">
+      <div class="editor-empty" id="editor-empty">
+        <div class="empty-illustration">
+          <div class="empty-ring"></div>
+          <div class="empty-sheet">
+            <svg class="icon"><use href="#i-sparkle"></use></svg>
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <h2 id="editor-empty-title">Nothing selected</h2>
+        <p id="editor-empty-body">Choose a note from the list or start something new.</p>
+        <button class="btn primary" id="editor-empty-new">
+          <svg class="icon"><use href="#i-plus"></use></svg>
+          <span data-i18n="editor.newNote">New note</span>
+        </button>
+        <div class="empty-hint">
+          <kbd>Ctrl</kbd><span>+</span><kbd>K</kbd>
+          <span data-i18n="editor.shortcutsHint">Tip: press Ctrl + K to jump anywhere</span>
+        </div>
+      </div>
+
+      <div class="editor-shell" id="editor-shell" hidden>
+        <header class="editor-topbar">
+          <div class="editor-topbar-left">
+            <button class="group-chip" id="note-group-btn">
+              <span class="group-dot" id="note-group-dot"></span>
+              <svg class="icon group-chip-icon" id="note-group-icon"><use href="#i-folder"></use></svg>
+              <span id="note-group-name">No notebook</span>
+              <svg class="icon tiny"><use href="#i-chevron-down"></use></svg>
+            </button>
+            <span class="dot-sep">·</span>
+            <span class="topbar-date" id="note-updated"></span>
+          </div>
+          <div class="editor-actions">
+            <button class="icon-btn" id="pin-btn" data-i18n-title="editor.pin" title="Pin note" aria-label="Pin note">
+              <svg class="icon"><use href="#i-pin"></use></svg>
+            </button>
+            <button class="icon-btn" id="favorite-btn" data-i18n-title="editor.favorite" title="Add to favorites" aria-label="Add to favorites">
+              <svg class="icon"><use href="#i-star"></use></svg>
+            </button>
+            <button class="icon-btn" id="archive-btn" data-i18n-title="editor.archive" title="Archive note" aria-label="Archive note">
+              <svg class="icon"><use href="#i-archive"></use></svg>
+            </button>
+            <span class="action-sep"></span>
+            <button class="icon-btn" id="more-btn" data-i18n-title="editor.more" title="More actions" aria-label="More actions">
+              <svg class="icon"><use href="#i-more"></use></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="editor-scroll" id="editor-scroll">
+          <article class="editor-doc" id="editor-doc">
+            <div class="trash-banner" id="trash-banner" hidden>
+              <svg class="icon"><use href="#i-info"></use></svg>
+              <span data-i18n="editor.trashBanner">This note is in the trash. Restore it to continue editing.</span>
+              <div class="trash-banner-actions">
+                <button class="btn small primary" id="banner-restore" data-i18n="editor.restore">Restore note</button>
+                <button class="btn small danger-ghost" id="banner-delete" data-i18n="editor.deleteForever">Delete forever</button>
+              </div>
+            </div>
+
+            <textarea id="note-title" class="note-title" rows="1" maxlength="500" placeholder="Untitled note" data-i18n-placeholder="editor.titlePlaceholder" spellcheck="true"></textarea>
+
+            <div class="note-meta">
+              <div class="note-meta-left">
+                <button class="meta-chip color-chip" id="color-btn">
+                  <span class="color-dot" id="note-color-dot"></span>
+                  <span id="color-label">Default</span>
+                  <svg class="icon tiny"><use href="#i-chevron-down"></use></svg>
+                </button>
+                <div class="tag-chips" id="note-tags"></div>
+                <button class="add-tag" id="add-tag-btn">
+                  <svg class="icon tiny"><use href="#i-plus"></use></svg>
+                  <span data-i18n="editor.addTag">Add tag</span>
+                </button>
+              </div>
+              <div class="note-meta-right">
+                <span id="note-stats"></span>
+              </div>
+            </div>
+
+            <div class="editor-toolbar-wrap">
+              <div class="editor-toolbar" id="editor-toolbar" role="toolbar">
+                <button class="tool-btn" data-cmd="undo" data-i18n-title="toolbar.undo" title="Undo">
+                  <svg class="icon"><use href="#i-undo"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="redo" data-i18n-title="toolbar.redo" title="Redo">
+                  <svg class="icon"><use href="#i-redo"></use></svg>
+                </button>
+                <span class="toolbar-sep"></span>
+                <select class="block-style" id="block-style" data-i18n-title="toolbar.paragraph" title="Paragraph style">
+                  <option value="p" data-i18n="toolbar.normal">Normal text</option>
+                  <option value="h1" data-i18n="toolbar.h1">Heading 1</option>
+                  <option value="h2" data-i18n="toolbar.h2">Heading 2</option>
+                  <option value="h3" data-i18n="toolbar.h3">Heading 3</option>
+                  <option value="blockquote" data-i18n="toolbar.quote">Quote</option>
+                  <option value="pre" data-i18n="toolbar.codeBlock">Code block</option>
+                </select>
+                <span class="toolbar-sep"></span>
+                <button class="tool-btn" data-cmd="bold" data-i18n-title="toolbar.bold" title="Bold">
+                  <svg class="icon"><use href="#i-bold"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="italic" data-i18n-title="toolbar.italic" title="Italic">
+                  <svg class="icon"><use href="#i-italic"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="underline" data-i18n-title="toolbar.underline" title="Underline">
+                  <svg class="icon"><use href="#i-underline"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="strikeThrough" data-i18n-title="toolbar.strike" title="Strikethrough">
+                  <svg class="icon"><use href="#i-strike"></use></svg>
+                </button>
+                <div class="tool-color-wrap">
+                  <button class="tool-btn color-tool" id="text-color-btn" data-i18n-title="toolbar.textColor" title="Text color">
+                    <span class="color-letter">A</span>
+                    <span class="color-underline" id="text-color-indicator"></span>
+                  </button>
+                  <button class="tool-btn color-tool" id="highlight-btn" data-i18n-title="toolbar.highlight" title="Highlight color">
+                    <svg class="icon"><use href="#i-marker"></use></svg>
+                    <span class="color-underline" id="highlight-indicator"></span>
+                  </button>
+                </div>
+                <span class="toolbar-sep"></span>
+                <button class="tool-btn" data-cmd="insertUnorderedList" data-i18n-title="toolbar.bullets" title="Bulleted list">
+                  <svg class="icon"><use href="#i-list"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="insertOrderedList" data-i18n-title="toolbar.numbers" title="Numbered list">
+                  <svg class="icon"><use href="#i-list-ordered"></use></svg>
+                </button>
+                <button class="tool-btn" id="checklist-btn" data-i18n-title="toolbar.checklist" title="Checklist">
+                  <svg class="icon"><use href="#i-checklist"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="formatBlock:blockquote" data-i18n-title="toolbar.quote" title="Quote">
+                  <svg class="icon"><use href="#i-quote"></use></svg>
+                </button>
+                <button class="tool-btn" id="inline-code-btn" data-i18n-title="toolbar.code" title="Inline code">
+                  <svg class="icon"><use href="#i-code"></use></svg>
+                </button>
+                <span class="toolbar-sep"></span>
+                <button class="tool-btn" data-cmd="justifyLeft" data-i18n-title="toolbar.alignLeft" title="Align left">
+                  <svg class="icon"><use href="#i-align-left"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="justifyCenter" data-i18n-title="toolbar.alignCenter" title="Align center">
+                  <svg class="icon"><use href="#i-align-center"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="justifyRight" data-i18n-title="toolbar.alignRight" title="Align right">
+                  <svg class="icon"><use href="#i-align-right"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="outdent" data-i18n-title="toolbar.outdent" title="Decrease indent">
+                  <svg class="icon"><use href="#i-outdent"></use></svg>
+                </button>
+                <button class="tool-btn" data-cmd="indent" data-i18n-title="toolbar.indent" title="Increase indent">
+                  <svg class="icon"><use href="#i-indent"></use></svg>
+                </button>
+                <span class="toolbar-sep"></span>
+                <button class="tool-btn" id="link-btn" data-i18n-title="toolbar.link" title="Insert link">
+                  <svg class="icon"><use href="#i-link"></use></svg>
+                </button>
+                <button class="tool-btn" id="table-btn" data-i18n-title="toolbar.table" title="Insert table">
+                  <svg class="icon"><use href="#i-table"></use></svg>
+                </button>
+                <button class="tool-btn" id="divider-btn" data-i18n-title="toolbar.divider" title="Insert divider">
+                  <svg class="icon"><use href="#i-divider"></use></svg>
+                </button>
+                <button class="tool-btn" id="image-btn" data-i18n-title="toolbar.image" title="Add image">
+                  <svg class="icon"><use href="#i-image"></use></svg>
+                </button>
+                <button class="tool-btn" id="draw-btn" data-i18n-title="toolbar.draw" title="Open drawing studio">
+                  <svg class="icon"><use href="#i-pen"></use></svg>
+                </button>
+                <button class="tool-btn" id="clear-format-btn" data-i18n-title="toolbar.clear" title="Clear formatting">
+                  <svg class="icon"><use href="#i-close"></use></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="note-body" class="note-body" contenteditable="true" spellcheck="true" data-placeholder="Start writing…"></div>
+            <div class="editor-end"></div>
+          </article>
+        </div>
+
+        <footer class="editor-statusbar">
+          <span class="save-status" id="save-status"><span class="status-dot"></span><span id="save-status-text">Saved</span></span>
+          <span class="status-sep">·</span>
+          <span id="word-count" class="word-count"></span>
+          <span class="toolbar-spacer"></span>
+          <button class="status-btn" id="history-btn" data-i18n-title="editor.history" title="Version history">
+            <svg class="icon"><use href="#i-history"></use></svg>
+            <span data-i18n="editor.history">Version history</span>
+          </button>
+          <button class="status-btn" id="fullscreen-status-btn" data-i18n-title="editor.fullscreen" title="Full screen">
+            <svg class="icon"><use href="#i-expand"></use></svg>
+            <span data-i18n="editor.fullscreen">Full screen</span>
+          </button>
+          <button class="status-btn" id="focus-status-btn" data-i18n-title="editor.focus" title="Focus mode">
+            <svg class="icon"><use href="#i-focus"></use></svg>
+            <span data-i18n="editor.focus">Focus mode</span>
+          </button>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <div class="tag-popover popover" id="tag-popover" hidden>
+    <div class="popover-head">
+      <span data-i18n="editor.tags">Tags</span>
+      <button class="mini-btn" id="tag-popover-close" aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+    </div>
+    <div class="tag-suggestions" id="tag-suggestions"></div>
+    <div class="tag-input-row">
+      <input id="tag-input" type="text" autocomplete="off" spellcheck="false" maxlength="42" data-i18n-placeholder="editor.tagPlaceholder" placeholder="Add a tag and press Enter">
+      <button class="mini-btn primary" id="tag-add-btn" aria-label="Add"><svg class="icon"><use href="#i-plus"></use></svg></button>
+    </div>
+    <p class="popover-hint" data-i18n="editor.tagsHint">Tags help you connect notes.</p>
+  </div>
+
+  <div class="modal draw-modal" id="draw-modal" hidden>
+    <div class="draw-shell" role="dialog" aria-modal="true" aria-labelledby="draw-title">
+      <header class="draw-header">
+        <div>
+          <h2 id="draw-title" data-i18n="draw.title">Drawing studio</h2>
+          <p data-i18n="draw.subtitle">Sketch something and add it to your note.</p>
+        </div>
+        <button class="icon-btn" data-close-draw aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="draw-main">
+        <aside class="draw-tools">
+          <div class="draw-tool-group">
+            <button class="draw-tool active" data-draw-tool="pen" data-i18n-title="draw.pen" title="Pen"><svg class="icon"><use href="#i-pen"></use></svg></button>
+            <button class="draw-tool" data-draw-tool="marker" data-i18n-title="draw.marker" title="Marker"><svg class="icon"><use href="#i-marker"></use></svg></button>
+            <button class="draw-tool" data-draw-tool="eraser" data-i18n-title="draw.eraser" title="Eraser"><svg class="icon"><use href="#i-eraser"></use></svg></button>
+          </div>
+          <div class="draw-divider"></div>
+          <div class="draw-colors" id="draw-colors"></div>
+          <div class="draw-divider"></div>
+          <label class="draw-size">
+            <span data-i18n="draw.size">Size</span>
+            <input id="draw-size" type="range" min="2" max="36" value="6">
+            <span id="draw-size-value">6</span>
+          </label>
+          <div class="draw-divider"></div>
+          <div class="draw-tool-group">
+            <button class="draw-tool" id="draw-undo" data-i18n-title="draw.undo" title="Undo"><svg class="icon"><use href="#i-undo"></use></svg></button>
+            <button class="draw-tool" id="draw-redo" data-i18n-title="draw.redo" title="Redo"><svg class="icon"><use href="#i-redo"></use></svg></button>
+            <button class="draw-tool" id="draw-clear" data-i18n-title="draw.clear" title="Clear canvas"><svg class="icon"><use href="#i-trash"></use></svg></button>
+          </div>
+        </aside>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas id="draw-canvas" width="1400" height="875"></canvas>
+          <div class="canvas-hint" id="canvas-hint" data-i18n="draw.hint">Draw with your mouse, trackpad or pen.</div>
+        </div>
+      </div>
+      <footer class="draw-footer">
+        <span class="draw-hint" data-i18n="draw.hint">Draw with your mouse, trackpad or pen.</span>
+        <div class="modal-actions">
+          <button class="btn" data-close-draw data-i18n="draw.cancel">Cancel</button>
+          <button class="btn primary" id="draw-insert" data-i18n="draw.insert">Add to note</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal settings-modal" id="settings-modal" hidden>
+    <div class="settings-shell" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-header">
+        <div>
+          <h2 id="settings-title" data-i18n="settings.title">Settings</h2>
+          <p data-i18n="settings.aboutText">A calm, local-first home for notes, ideas and sketches.</p>
+        </div>
+        <button class="icon-btn" data-close-settings aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="settings-body">
+        <nav class="settings-tabs">
+          <button class="settings-tab active" data-settings-tab="general"><svg class="icon"><use href="#i-settings"></use></svg><span data-i18n="settings.general">General</span></button>
+          <button class="settings-tab" data-settings-tab="editor"><svg class="icon"><use href="#i-edit"></use></svg><span data-i18n="settings.editor">Editor</span></button>
+          <button class="settings-tab" data-settings-tab="data"><svg class="icon"><use href="#i-database"></use></svg><span data-i18n="settings.data">Data</span></button>
+          <button class="settings-tab" data-settings-tab="about"><svg class="icon"><use href="#i-info"></use></svg><span data-i18n="settings.about">About</span></button>
+        </nav>
+        <div class="settings-content">
+          <section class="settings-panel active" data-settings-panel="general">
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.language">Language</h3>
+                <p data-i18n="settings.languageHint">English is the default. You can switch at any time.</p>
+              </div>
+              <div class="segmented" id="language-segmented">
+                <button data-set-language="en">English</button>
+                <button data-set-language="tr">Türkçe</button>
+              </div>
+            </div>
+            <div class="settings-section column">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.theme">Appearance</h3>
+                <p data-i18n="settings.themeHint">Choose how Notra looks.</p>
+              </div>
+              <div class="theme-cards">
+                <button class="theme-card" data-set-theme="system">
+                  <span class="theme-preview theme-system"><span></span></span>
+                  <svg class="icon"><use href="#i-monitor"></use></svg>
+                  <span data-i18n="settings.themeSystem">System</span>
+                </button>
+                <button class="theme-card" data-set-theme="light">
+                  <span class="theme-preview theme-light"><span></span></span>
+                  <svg class="icon"><use href="#i-sun"></use></svg>
+                  <span data-i18n="settings.themeLight">Light</span>
+                </button>
+                <button class="theme-card" data-set-theme="dark">
+                  <span class="theme-preview theme-dark"><span></span></span>
+                  <svg class="icon"><use href="#i-moon"></use></svg>
+                  <span data-i18n="settings.themeDark">Dark</span>
+                </button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.accent">Accent color</h3>
+                <p data-i18n="settings.accentHint">Used for highlights and active elements.</p>
+              </div>
+              <div class="accent-swatches" id="accent-swatches">
+                <button data-set-accent="amber" style="--swatch:#e5a94b" aria-label="Amber"></button>
+                <button data-set-accent="teal" style="--swatch:#53b8a7" aria-label="Teal"></button>
+                <button data-set-accent="violet" style="--swatch:#9b8ce0" aria-label="Violet"></button>
+                <button data-set-accent="rose" style="--swatch:#e07a8d" aria-label="Rose"></button>
+                <button data-set-accent="blue" style="--swatch:#64a8e8" aria-label="Blue"></button>
+                <button data-set-accent="green" style="--swatch:#7fbb6a" aria-label="Green"></button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.defaultView">Startup view</h3>
+                <p data-i18n="settings.defaultViewHint">The view that opens when Notra starts.</p>
+              </div>
+              <select class="setting-select" id="setting-default-view">
+                <option value="all" data-i18n="nav.all">All notes</option>
+                <option value="favorites" data-i18n="nav.favorites">Favorites</option>
+                <option value="archive" data-i18n="nav.archive">Archive</option>
+              </select>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.sort">Default sort</h3>
+                <p data-i18n="settings.sortHint">How notes are ordered in the list.</p>
+              </div>
+              <select class="setting-select" id="setting-sort">
+                <option value="updated_desc" data-i18n="list.sortUpdated">Last edited</option>
+                <option value="created_desc" data-i18n="list.sortCreated">Date created</option>
+                <option value="title_asc" data-i18n="list.sortTitle">Title A–Z</option>
+                <option value="words_desc" data-i18n="list.sortWords">Most words</option>
+              </select>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.compact">Compact note list</h3>
+                <p data-i18n="settings.compactHint">Show more notes at once with smaller cards.</p>
+              </div>
+              <label class="switch"><input type="checkbox" id="setting-compact"><span class="track"><span class="thumb"></span></span></label>
+            </div>
+          </section>
+
+          <section class="settings-panel" data-settings-panel="editor">
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.fontFamily">Editor font</h3>
+                <p data-i18n="settings.fontFamilyHint">Choose the typeface for writing.</p>
+              </div>
+              <div class="segmented" id="font-segmented">
+                <button data-set-font="sans" data-i18n="settings.fontSans">Sans</button>
+                <button data-set-font="serif" data-i18n="settings.fontSerif">Serif</button>
+                <button data-set-font="mono" data-i18n="settings.fontMono">Mono</button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.fontSize">Text size</h3>
+                <p data-i18n="settings.fontSizeHint">Adjust the size of the note body.</p>
+              </div>
+              <div class="range-wrap">
+                <input type="range" id="setting-font-size" min="13" max="24" step="1">
+                <span class="range-value" id="font-size-value">17</span>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.spellcheck">Check spelling while typing</h3>
+                <p data-i18n="settings.spellcheckHint">Uses your system spell checker.</p>
+              </div>
+              <label class="switch"><input type="checkbox" id="setting-spellcheck"><span class="track"><span class="thumb"></span></span></label>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.wordCount">Show word count</h3>
+                <p data-i18n="settings.wordCountHint">Display words and reading time at the bottom.</p>
+              </div>
+              <label class="switch"><input type="checkbox" id="setting-word-count"><span class="track"><span class="thumb"></span></span></label>
+            </div>
+            <div class="editor-preview">
+              <div class="preview-label" data-i18n="history.preview">Preview</div>
+              <div class="preview-text" id="font-preview">The quiet mind is a fertile place.</div>
+            </div>
+          </section>
+
+          <section class="settings-panel" data-settings-panel="data">
+            <div class="settings-section column">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.dataTitle">Your data</h3>
+                <p data-i18n="settings.dataHint">Everything is stored locally on this device. Nothing leaves your computer.</p>
+              </div>
+              <div class="data-path">
+                <span id="data-path">—</span>
+                <button class="btn small" id="open-data-folder"><svg class="icon"><use href="#i-folder-open"></use></svg><span data-i18n="settings.openFolder">Open folder</span></button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.exportBackup">Export backup</h3>
+                <p data-i18n="settings.importHint">Backups are JSON files that include every note, notebook and tag.</p>
+              </div>
+              <button class="btn" id="export-backup-btn"><svg class="icon"><use href="#i-download"></use></svg><span data-i18n="settings.exportBackup">Export backup</span></button>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.importBackup">Import backup</h3>
+                <p data-i18n="settings.importHint">Backups are JSON files that include every note, notebook and tag.</p>
+              </div>
+              <button class="btn" id="import-backup-btn"><svg class="icon"><use href="#i-upload"></use></svg><span data-i18n="settings.importBackup">Import backup</span></button>
+            </div>
+            <div class="settings-section">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.stats">Statistics</h3>
+                <p data-i18n="settings.statsHint">A quick look at your notebook.</p>
+              </div>
+              <button class="btn" id="open-stats-btn"><svg class="icon"><use href="#i-sparkle"></use></svg><span data-i18n="settings.stats">Statistics</span></button>
+            </div>
+            <div class="settings-section column">
+              <div class="setting-copy">
+                <h3 data-i18n="settings.autoBackup">Automatic backups</h3>
+                <p data-i18n="settings.autoBackupHint">Notra keeps a daily copy in the backups folder.</p>
+              </div>
+              <div class="data-meta" id="backup-meta"></div>
+            </div>
+          </section>
+
+          <section class="settings-panel" data-settings-panel="about">
+            <div class="about-hero">
+              <img src="assets/icon.png" alt="" class="about-logo">
+              <div>
+                <h3>Notra</h3>
+                <p data-i18n="settings.aboutText">A calm, local-first home for notes, ideas and sketches.</p>
+                <span class="version-pill" id="about-version">v1.0.0</span>
+              </div>
+            </div>
+            <div class="about-grid">
+              <button class="about-card" id="about-shortcuts">
+                <svg class="icon"><use href="#i-keyboard"></use></svg>
+                <span data-i18n="settings.shortcuts">Keyboard shortcuts</span>
+              </button>
+              <button class="about-card" id="about-stats">
+                <svg class="icon"><use href="#i-sparkle"></use></svg>
+                <span data-i18n="settings.stats">Statistics</span>
+              </button>
+              <button class="about-card" id="about-data">
+                <svg class="icon"><use href="#i-database"></use></svg>
+                <span data-i18n="settings.data">Data</span>
+              </button>
+            </div>
+            <p class="about-foot">Made for thoughts worth keeping.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal group-modal" id="group-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="group-modal-title">
+      <header class="modal-head">
+        <div>
+          <h2 id="group-modal-title">New notebook</h2>
+          <p id="group-modal-subtitle"></p>
+        </div>
+        <button class="icon-btn" data-close-group aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="modal-body">
+        <label class="field-label" for="group-name" data-i18n="group.name">Name</label>
+        <input id="group-name" class="text-input" type="text" maxlength="60" autocomplete="off" data-i18n-placeholder="group.namePlaceholder" placeholder="e.g. Projects">
+        <div class="field-label" data-i18n="group.color">Color</div>
+        <div class="group-colors" id="group-colors"></div>
+        <div class="field-label" data-i18n="group.icon">Icon</div>
+        <div class="group-icons" id="group-icons"></div>
+        <p class="form-error" id="group-error" hidden></p>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn danger-ghost" id="group-delete" hidden><svg class="icon"><use href="#i-trash"></use></svg><span data-i18n="group.delete">Delete notebook</span></button>
+        <span class="toolbar-spacer"></span>
+        <button class="btn" data-close-group data-i18n="dialog.cancel">Cancel</button>
+        <button class="btn primary" id="group-save" data-i18n="group.create">Create notebook</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal move-modal" id="move-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="move-modal-title">
+      <header class="modal-head">
+        <div>
+          <h2 id="move-modal-title" data-i18n="editor.moveTitle">Move to notebook</h2>
+          <p id="move-modal-subtitle"></p>
+        </div>
+        <button class="icon-btn" data-close-move aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="move-list" id="move-list"></div>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn" data-close-move data-i18n="dialog.cancel">Cancel</button>
+        <button class="btn primary" id="move-confirm" data-i18n="list.move">Move</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal history-modal" id="history-modal" hidden>
+    <div class="history-shell" role="dialog" aria-modal="true" aria-labelledby="history-title">
+      <header class="modal-head">
+        <div>
+          <h2 id="history-title" data-i18n="history.title">Version history</h2>
+          <p data-i18n="history.subtitle">A snapshot is saved while you edit. Newest first.</p>
+        </div>
+        <button class="icon-btn" data-close-history aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="history-body">
+        <div class="history-list" id="history-list"></div>
+        <div class="history-preview" id="history-preview">
+          <div class="history-placeholder" id="history-placeholder"><svg class="icon"><use href="#i-history"></use></svg><p data-i18n="history.select">Select a version to preview it.</p></div>
+          <div class="history-doc" id="history-doc" hidden></div>
+        </div>
+      </div>
+      <footer class="modal-foot">
+        <span class="toolbar-spacer"></span>
+        <button class="btn" data-close-history data-i18n="dialog.close">Close</button>
+        <button class="btn primary" id="history-restore" disabled data-i18n="history.restore">Restore this version</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal confirm-modal" id="confirm-modal" hidden>
+    <div class="modal-card confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div class="confirm-icon" id="confirm-icon"><svg class="icon"><use href="#i-alert"></use></svg></div>
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-body"></p>
+      <div class="modal-actions">
+        <button class="btn" id="confirm-cancel" data-i18n="dialog.cancel">Cancel</button>
+        <button class="btn danger" id="confirm-ok" data-i18n="dialog.delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal prompt-modal" id="prompt-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="prompt-title">
+      <header class="modal-head">
+        <h2 id="prompt-title"></h2>
+      </header>
+      <div class="modal-body">
+        <p id="prompt-body"></p>
+        <label class="field-label" id="prompt-label" for="prompt-input"></label>
+        <input id="prompt-input" class="text-input" type="text" autocomplete="off">
+        <p class="form-error" id="prompt-error" hidden></p>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn" id="prompt-cancel" data-i18n="dialog.cancel">Cancel</button>
+        <button class="btn primary" id="prompt-ok" data-i18n="common.save">Save</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="overlay command-overlay" id="palette" hidden>
+    <div class="command-panel" role="dialog" aria-modal="true" aria-labelledby="palette-input">
+      <div class="command-search">
+        <svg class="icon"><use href="#i-command"></use></svg>
+        <input id="palette-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="commands.placeholder" placeholder="Search notes or type a command…">
+        <kbd>Esc</kbd>
+      </div>
+      <div class="command-results" id="palette-results"></div>
+      <div class="command-footer" data-i18n="commands.hint">↑↓ navigate · ↵ select · Esc close</div>
+    </div>
+  </div>
+
+  <div class="modal shortcuts-modal" id="shortcuts-modal" hidden>
+    <div class="modal-card shorts-card" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+      <header class="modal-head">
+        <div>
+          <h2 id="shortcuts-title" data-i18n="shortcuts.title">Keyboard shortcuts</h2>
+          <p data-i18n="settings.shortcuts">Keyboard shortcuts</p>
+        </div>
+        <button class="icon-btn" data-close-shortcuts aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="shorts-grid" id="shorts-grid"></div>
+      <footer class="modal-foot">
+        <span class="toolbar-spacer"></span>
+        <button class="btn primary" data-close-shortcuts data-i18n="dialog.done">Done</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal stats-modal" id="stats-modal" hidden>
+    <div class="modal-card stats-card" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+      <header class="modal-head">
+        <div>
+          <h2 id="stats-title" data-i18n="stats.title">Statistics</h2>
+          <p data-i18n="settings.statsHint">A quick look at your notebook.</p>
+        </div>
+        <button class="icon-btn" data-close-stats aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="stats-grid" id="stats-grid"></div>
+      <footer class="modal-foot">
+        <span class="toolbar-spacer"></span>
+        <button class="btn primary" data-close-stats data-i18n="stats.done">Done</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal table-modal" id="table-modal" hidden>
+    <div class="modal-card table-modal-card" role="dialog" aria-modal="true" aria-labelledby="table-modal-title">
+      <header class="modal-head">
+        <div>
+          <h2 id="table-modal-title" data-i18n="table.insertTitle">Insert table</h2>
+          <p data-i18n="table.insertBody">Choose a size. You can add or remove rows and columns later.</p>
+        </div>
+        <button class="icon-btn" data-close-table aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+      </header>
+      <div class="modal-body">
+        <div class="table-size-presets">
+          <button type="button" class="table-size-preset" data-table-preset="2,2">2 × 2</button>
+          <button type="button" class="table-size-preset active" data-table-preset="3,3">3 × 3</button>
+          <button type="button" class="table-size-preset" data-table-preset="4,4">4 × 4</button>
+          <button type="button" class="table-size-preset" data-table-preset="5,3">5 × 3</button>
+        </div>
+        <div class="table-size-fields">
+          <label for="table-rows">
+            <span class="field-label" data-i18n="table.rows">Rows</span>
+            <input id="table-rows" class="text-input" type="number" min="1" max="30" value="3" inputmode="numeric">
+          </label>
+          <span class="table-size-x">×</span>
+          <label for="table-columns">
+            <span class="field-label" data-i18n="table.columns">Columns</span>
+            <input id="table-columns" class="text-input" type="number" min="1" max="30" value="3" inputmode="numeric">
+          </label>
+        </div>
+        <label class="table-header-option">
+          <input id="table-header-row" type="checkbox" checked>
+          <span data-i18n="table.header">Header row</span>
+        </label>
+        <p class="form-hint" data-i18n="table.hint">Tip: press Tab to move between cells. At the last cell, a new row is added.</p>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn" data-close-table data-i18n="dialog.cancel">Cancel</button>
+        <button class="btn primary" id="table-insert-btn" data-i18n="table.insert">Insert table</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="table-tools" id="table-tools" hidden role="toolbar" aria-label="Table tools">
+    <span class="table-tools-label" data-i18n="table.tools">Table</span>
+    <button type="button" class="table-tool" data-table-action="add-row" data-i18n="table.addRow">+ Row</button>
+    <button type="button" class="table-tool" data-table-action="add-column" data-i18n="table.addColumn">+ Column</button>
+    <span class="table-tools-sep"></span>
+    <button type="button" class="table-tool" data-table-action="remove-row" data-i18n="table.removeRow">− Row</button>
+    <button type="button" class="table-tool" data-table-action="remove-column" data-i18n="table.removeColumn">− Column</button>
+    <span class="table-tools-sep"></span>
+    <button type="button" class="table-tool danger" data-table-action="delete" data-i18n="table.delete">Delete table</button>
+  </div>
+
+  <div class="modal image-modal" id="image-modal" hidden>
+    <button class="image-close" id="image-close" aria-label="Close"><svg class="icon"><use href="#i-close"></use></svg></button>
+    <img id="image-preview" alt="">
+  </div>
+
+  <div class="context-menu" id="context-menu" hidden></div>
+  <div class="toast-stack" id="toast-stack"></div>
+
+  <script src="i18n.js"></script>
+  <script src="mock.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
