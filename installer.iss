@@ -1,5 +1,5 @@
 #define MyAppName "Notra"
-#define MyAppVersion "1.1.3"
+#define MyAppVersion "1.1.4"
 #define MyAppPublisher "Notra"
 #define MyAppExeName "Notra.exe"
 
@@ -22,7 +22,7 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
-AppMutex=Local\NotraNotesApp-9D52A54A
+RestartApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

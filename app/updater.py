@@ -249,14 +249,23 @@ def launch_installer(path: str) -> dict[str, Any]:
             getattr(subprocess, "DETACHED_PROCESS", 0)
             | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
         )
+        log_path = UPDATE_DIR.parent / "update.log"
+        try:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            log_path = None
+        args = [
+            str(installer),
+            "/VERYSILENT",
+            "/SUPPRESSMSGBOXES",
+            "/NORESTART",
+            "/CLOSEAPPLICATIONS",
+            "/FORCECLOSEAPPLICATIONS",
+        ]
+        if log_path is not None:
+            args.append(f"/LOG={log_path}")
         subprocess.Popen(
-            [
-                str(installer),
-                "/VERYSILENT",
-                "/SUPPRESSMSGBOXES",
-                "/NORESTART",
-                "/CLOSEAPPLICATIONS",
-            ],
+            args,
             close_fds=True,
             creationflags=creation_flags,
         )
