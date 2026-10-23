@@ -454,7 +454,7 @@
       preview.style.fontFamily = settings.font_family === 'serif' ? 'var(--font-serif)' : settings.font_family === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)';
     }
     const info = $('#app-version');
-    if (info) info.textContent = `v${settings.version || '1.1.9'}`;
+    if (info) info.textContent = `v${settings.version || '1.1.10'}`;
   }
 
   function applySettings() {
@@ -1649,7 +1649,7 @@
         meta.textContent = `${t('stats.storage')}: ${formatBytes(stats.storage_bytes)} Ã‚Â· ${t('stats.lastBackup')}: ${backup}`;
       }
       const version = $('#about-version');
-      if (version) version.textContent = `v${state.app?.version || '1.1.9'}`;
+      if (version) version.textContent = `v${state.app?.version || '1.1.10'}`;
     } catch (error) {
       console.error(error);
     }

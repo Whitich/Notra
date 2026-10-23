@@ -190,7 +190,7 @@ def main() -> None:
         x=x,
         y=y,
         min_size=(1000, 640),
-        background_color="#111217",
+        background_color="#ffffff",
         text_select=True,
         hidden=True,
         maximized=bool(settings.get("window_maximized")),
